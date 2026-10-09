@@ -320,7 +320,7 @@ export const zhCN: MessageSchema = {
     "connectYourAppsForABetterExperience": "连接应用，获得更好的体验",
     "configureAZapierIntegration": "配置 Zapier 集成",
     "useWebhooksToIntegrateWithOtherTools": "使用 Webhook 集成其他工具",
-    "forkThis": "复用此项目",
+    "forkThis": "Fork 此项目",
     "forkThisHarness": "复用工作区演示",
     "thisWholeHarnessIsOpenSourceHandTheseInstructions": "整个演示均为开源。把以下说明交给编程智能体，即可集成到你的产品中。",
     "giveThisToYourAgent": "交给你的智能体",

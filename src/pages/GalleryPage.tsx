@@ -41,7 +41,14 @@ const Home = createComponent<Record<string, never>>("Home", [], (__props, __slot
             </div>
           </div>
 
-          <div class="mt-6 shrink-0 border-t border-dashed border-line pt-4">
+          <div class="mt-6 shrink-0 border-t border-dashed border-line pt-2">
+            <Link href="/harness" className="mb-2 flex items-center justify-between gap-3 rounded-control px-2 py-2 text-[12.5px] font-medium text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink">
+              {t("gallery.iceCreamHarness")}
+              <svg class="shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </Link>
+            <div class="mb-2 border-t border-dashed border-line" />
             <a href="https://github.com/jiajie-yang/beautiful-ui-vue" target="_blank" rel="noreferrer" class="group flex items-center justify-between gap-3 rounded-control px-2 py-2 text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink">
               <span class="min-w-0">
                 <span class="flex items-center gap-1.5 text-[12.5px] font-medium leading-[14px]">

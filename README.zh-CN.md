@@ -8,10 +8,10 @@
 
 ## 预览
 
-桌面聊天与供应商工作区：
+简体中文界面的桌面聊天与供应商工作区：
 
-![聊天演示](docs/images/chat-demo.png)
-![供应商工作区](docs/images/supplier-workspace.png)
+![简体中文聊天演示](docs/images/chat-demo.zh-CN.jpg)
+![简体中文供应商工作区](docs/images/supplier-workspace.zh-CN.jpg)
 
 ## 运行与验证
 

@@ -18,6 +18,9 @@
  * ────────────────────────────────────────────────────────── */
 
 :root {
+  /* Native controls and all inherited scrollbars follow the active theme. */
+  color-scheme: light;
+  scrollbar-color: var(--line-strong) transparent;
   /* surfaces — cool, blue-tinted neutrals */
   --page: oklch(0.985 0.001 286.376);
   --canvas: oklch(0.961 0.002 247.84);
@@ -71,6 +74,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --page: oklch(0.209 0.004 264.477);
   --canvas: oklch(0.231 0.004 264.487);
   --surface: oklch(0.26 0.006 271.191);

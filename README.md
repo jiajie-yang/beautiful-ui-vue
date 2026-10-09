@@ -8,10 +8,10 @@ This README is available in Chinese and English. The demo UI supports English an
 
 ## Preview
 
-Desktop chat and supplier workspace:
+Desktop chat and supplier workspace in English:
 
-![Chat demo](docs/images/chat-demo.png)
-![Supplier workspace](docs/images/supplier-workspace.png)
+![Chat demo in English](docs/images/chat-demo.en.jpg)
+![Supplier workspace in English](docs/images/supplier-workspace.en.jpg)
 
 ## Running and validation
 

@@ -1,4 +1,5 @@
 import LanguageToggle from './LanguageToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { t, locale } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
@@ -897,8 +898,8 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
       {chats.value.map(c => <div key={c.id}
     /* fixed width so every close button sits in the same spot — you can
      * close a run of tabs without chasing the next × across the bar */ class={`group/tab flex h-7 w-36 shrink-0 items-center gap-0.5 rounded-[7px] pl-2.5 pr-0.5 text-[12.5px] font-medium transition-colors duration-100 ${c.id === activeId.value ? "bg-hover-2 text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"}`}>
-          <button type="button" aria-pressed={c.id === activeId.value} onClick={() => setActiveId(c.id)} title={c.title ?? "New chat"} class="min-w-0 flex-1 text-left">
-            <span class="block truncate">{c.title ?? "New chat"}</span>
+          <button type="button" aria-pressed={c.id === activeId.value} onClick={() => setActiveId(c.id)} title={c.title ?? t("common.newChat")} class="min-w-0 flex-1 text-left">
+            <span class="block truncate">{c.title ?? t("common.newChat")}</span>
           </button>
           <button type="button" aria-label={t("harness.closeTab")} onClick={() => closeChat(c.id)} class="-my-1 flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-[background-color,color] duration-100 hover:bg-hover-2 hover:text-ink">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
@@ -945,7 +946,7 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
       <SidebarNav fill className="hidden lg:flex" recents={RECENTS} activeRecentId={chat.value.recentId ?? null} onPick={(id, label, prompt) => pickRecent(id as ScenarioId, label, prompt)} onNewChat={newChat} footerLabel={t("harness.forkThis")} onFooterClick={() => setUseOpen(true)} />
 
       <div class="flex min-w-0 flex-1 flex-col gap-2.5">
-        <header class="flex shrink-0 items-center justify-between gap-2 px-2"><a href="/" class="text-[12px] text-ink-2 hover:text-ink">{t("common.components")}</a><LanguageToggle /></header>
+        <header class="flex shrink-0 items-center justify-between gap-2 px-2"><a href="/" class="text-[12px] text-ink-2 hover:text-ink">{t("common.components")}</a><div class="flex shrink-0 items-center gap-2"><LanguageToggle /><ThemeToggle /></div></header>
         {/* panels row — main pane + docked side pane */}
         <div class="flex min-h-0 flex-1 gap-2.5">
           {workspaceScenario.value ? <>
