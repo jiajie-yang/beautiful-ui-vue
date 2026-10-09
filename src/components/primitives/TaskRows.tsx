@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -93,46 +94,46 @@ export type TaskRowsLabels = {
   failed: string;
 };
 const DEFAULT_LABELS: TaskRowsLabels = {
-  completed: "Completed",
-  failed: "Failed"
+  get completed() { return t("common.completed"); },
+  get failed() { return t("common.failed"); }
 };
 const TASK_ROWS: TaskRow[] = [{
   key: "verify",
-  label: "Verified vendor records",
-  amount: "12 suppliers",
+  get label() { return t("taskRows.verifiedVendorRecords"); },
+  get amount() { return t("taskRows.label12Suppliers"); },
   status: "done",
   details: [{
-    label: "Matched tax and contact IDs",
+    get label() { return t("taskRows.matchedTaxAndContactIds"); },
     meta: "12/12"
   }, {
-    label: "Flagged stale records",
+    get label() { return t("taskRows.flaggedStaleRecords"); },
     meta: "0"
   }]
 }, {
   key: "index",
-  label: "Build reorder task list",
-  amount: "7 SKUs",
+  get label() { return t("taskRows.buildReorderTaskList"); },
+  get amount() { return t("taskRows.label7Skus"); },
   status: "running",
   step: 2,
   details: [{
-    label: "Reading POS export",
-    meta: "3 files"
+    get label() { return t("taskRows.readingPosExport"); },
+    get meta() { return t("taskRows.label3Files"); }
   }, {
-    label: "Scoring stockout risk",
+    get label() { return t("taskRows.scoringStockoutRisk"); },
     meta: "68%"
   }]
 }, {
   key: "draft",
-  label: "Draft supplier emails",
-  amount: "2 messages",
+  get label() { return t("taskRows.draftSupplierEmails"); },
+  get amount() { return t("taskRows.label2Messages"); },
   status: "sequence",
   step: 3,
   details: [{
-    label: "Cone supplier follow-up",
-    meta: "draft"
+    get label() { return t("taskRows.coneSupplierFollowUp"); },
+    get meta() { return t("taskRows.draft"); }
   }, {
-    label: "Pistachio reorder note",
-    meta: "draft"
+    get label() { return t("taskRows.pistachioReorderNote"); },
+    get meta() { return t("taskRows.draft"); }
   }]
 }];
 const TaskRows = createComponent<{

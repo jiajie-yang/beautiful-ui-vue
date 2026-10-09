@@ -6,7 +6,7 @@ it('all registry items include every local import and exclude React dependencies
  expect(items).toHaveLength(33)
  for(const name of items){
   const item=JSON.parse(await readFile(new URL(name,dir),'utf8'))
-  for(const dependency of item.dependencies) expect(dependency).toMatch(/^(?:@[a-z0-9_.-]+\/)?[a-z0-9_.-]+$/i)
+  for(const dependency of item.dependencies) expect(dependency).toMatch(/^(?:@[a-z0-9_.-]+\/)?[a-z0-9_.-]+(?:@\^?\d+\.\d+\.\d+)?$/i)
   expect(item.dependencies).not.toEqual(expect.arrayContaining(['react','react-dom','next']))
   const paths=new Set(item.files.map((f:{target:string})=>f.target.replace(/^~\//,'')))
   for(const file of item.files){

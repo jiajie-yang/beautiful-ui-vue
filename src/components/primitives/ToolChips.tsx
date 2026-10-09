@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -22,6 +23,8 @@ export type ToolDetailLine = {
   tone?: "add";
 };
 export type ToolStep = {
+  /** Stable identity; falls back to the step index when omitted. */
+  id?: string;
   icon: string;
   label: string;
   chip: string;
@@ -43,23 +46,23 @@ export type ToolChipsLabels = {
   more: string;
 };
 const DEFAULT_LABELS: ToolChipsLabels = {
-  header: "4 tool calls, 2 messages",
-  more: "+2 more"
+  get header() { return t("toolChips.label4ToolCalls2Messages"); },
+  get more() { return t("toolChips.label2More"); }
 };
 const ROWS: ToolStep[] = [{
   icon: "think",
-  label: "Thinking",
-  chip: "Planning the churn schedule…",
+  get label() { return t("common.thinking"); },
+  get chip() { return t("toolChips.planningTheChurnSchedule"); },
   mono: false,
   detailMono: false,
   detail: [{
-    text: "Weekend demand carries pistachio, so it churns first."
+    get text() { return t("toolChips.weekendDemandCarriesPistachioSoItChurnsFirst"); }
   }, {
-    text: "Batch capacity leaves two evening freezer windows."
+    get text() { return t("toolChips.batchCapacityLeavesTwoEveningFreezerWindows"); }
   }]
 }, {
   icon: "write",
-  label: "Write 204 lines",
+  get label() { return t("toolChips.write204Lines"); },
   chip: "ChurnSchedule.tsx",
   mono: true,
   detailMono: true,
@@ -72,25 +75,25 @@ const ROWS: ToolStep[] = [{
   }]
 }, {
   icon: "run",
-  label: "Rebuild and verify",
+  get label() { return t("toolChips.rebuildAndVerify"); },
   chip: "npm run freeze",
   mono: true,
   detailMono: true,
   detail: [{
-    text: "✓ built in 1.2s"
+    get text() { return t("toolChips.builtIn12s"); }
   }, {
-    text: "✓ 34 checks passed"
+    get text() { return t("toolChips.label34ChecksPassed"); }
   }]
 }, {
   icon: "read",
-  label: "Read image",
+  get label() { return t("toolChips.readImage"); },
   chip: "flavor-chart.png",
   mono: true,
   detailMono: false,
   detail: [{
-    text: "1280 × 720 · line chart, three summers."
+    get text() { return t("toolChips.label1280720LineChartThreeSummers"); }
   }, {
-    text: "Mint chip trends up 12% through July."
+    get text() { return t("toolChips.mintChipTrendsUp12ThroughJuly"); }
   }]
 }];
 const DIFFS: ToolDiff[] = [{
@@ -204,10 +207,10 @@ const ToolChips = createComponent<{
     const t = setTimeout(() => setStep(s => s + 1), STEP_MS);
     return () => clearTimeout(t);
   }, () => [step.value, total.value]);
-  const toggleRow = (label: string) => setOpenRows(current => {
+  const toggleRow = (id: string, label: string) => setOpenRows(current => {
     const next = new Set(current);
-    next.has(label) ? next.delete(label) : next.add(label);
-    onToggleRow.value?.(label, next.has(label));
+    next.has(id) ? next.delete(id) : next.add(id);
+    onToggleRow.value?.(label, next.has(id));
     return next;
   });
   return () => {
@@ -234,12 +237,13 @@ const ToolChips = createComponent<{
             row hover pills room inside this overflow-hidden clip box */}
         <div class="-mx-1 overflow-hidden px-1.5 pb-1">
         <div class="mt-1.5 flex flex-col gap-1">
-          {steps.value.slice(0, step.value).map(row => {
-              const rowOpen = openRows.value.has(row.label);
-              return <div key={row.label} style={cssStyle({
+          {steps.value.slice(0, step.value).map((row, index) => {
+              const rowId = row.id ?? `step-${index}`;
+              const rowOpen = openRows.value.has(rowId);
+              return <div key={rowId} style={cssStyle({
                 animation: "fade-up 300ms cubic-bezier(0.23,1,0.32,1) both"
               })}>
-              <button type="button" aria-expanded={rowOpen} onClick={() => toggleRow(row.label)} class="group/row -mx-[3px] flex h-7 w-[calc(100%+6px)] min-w-0 items-center gap-2 rounded-control px-[3px] text-left transition-colors duration-100 hover:bg-hover-2">
+              <button type="button" aria-expanded={rowOpen} onClick={() => toggleRow(rowId, row.label)} class="group/row -mx-[3px] flex h-7 w-[calc(100%+6px)] min-w-0 items-center gap-2 rounded-control px-[3px] text-left transition-colors duration-100 hover:bg-hover-2">
                 <span class="relative flex size-4 shrink-0 items-center justify-center text-ink-3">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill={row.icon === "think" ? "currentColor" : "none"} stroke="currentColor" class={`transition-opacity duration-100 group-hover/row:opacity-0 ${rowOpen ? "opacity-0" : ""}`}>
                     {Icons[row.icon]}
@@ -279,14 +283,14 @@ const ToolChips = createComponent<{
       {/* file-diff chips */}
       {step.value >= total.value && <div class="mt-2.5 flex max-w-full flex-wrap gap-1.5 border-t border-line pt-2.5">
           {diffs.value.map((d, i) => <span key={d.file} data-diffchip class="relative" onMouseenter={openPreview(d.file)} onMouseleave={closePreview(d.file)}>
-              <button type="button" aria-expanded={preview.value!?.file === d.file} aria-label={`Show diff for ${d.file}`} onFocus={openPreview(d.file)} onBlur={closePreview(d.file)} class="inline-flex h-7 max-w-full items-center gap-2 rounded-chip
+              <button type="button" aria-expanded={preview.value!?.file === d.file} aria-label={t("toolChips.showDiff", { file: d.file })} onFocus={openPreview(d.file)} onBlur={closePreview(d.file)} class="inline-flex h-7 max-w-full items-center gap-2 rounded-chip
                   bg-surface px-2 font-mono text-[11.5px] text-ink shadow-btn
                   transition-colors duration-100 hover:bg-hover" style={cssStyle({
                 animation: `pop-in 250ms cubic-bezier(0.23,1,0.32,1) ${i * 80}ms both`
               })}>
                 <span class="min-w-0 truncate">{d.file}</span>
-                <span class="shrink-0 text-green tabular-nums">+{d.add}</span>
-                {d.del > 0 && <span class="shrink-0 text-red tabular-nums">−{d.del}</span>}
+                <span class="shrink-0 text-green tabular-nums">{"+"}{d.add}</span>
+                {d.del > 0 && <span class="shrink-0 text-red tabular-nums">{" −"}{d.del}</span>}
               </button>
 
             </span>)}
@@ -310,8 +314,8 @@ const ToolChips = createComponent<{
           <div class="flex items-center justify-between border-b border-line px-2.5 py-1.5 font-mono text-[11px]">
             <span class="min-w-0 truncate text-ink-2">{preview.value!.file}</span>
             <span class="shrink-0 tabular-nums">
-              <span class="text-green">+{diffs.value.find(diff => diff.file === preview.value!.file)?.add}</span>
-              {(diffs.value.find(diff => diff.file === preview.value!.file)?.del ?? 0) > 0 && <span class="text-red"> −{diffs.value.find(diff => diff.file === preview.value!.file)?.del}</span>}
+              <span class="text-green">{"+"}{diffs.value.find(diff => diff.file === preview.value!.file)?.add}</span>
+              {(diffs.value.find(diff => diff.file === preview.value!.file)?.del ?? 0) > 0 && <span class="text-red"> {"−"}{diffs.value.find(diff => diff.file === preview.value!.file)?.del}</span>}
             </span>
           </div>
           <div class="py-1 font-mono text-[11px] leading-[1.8]">

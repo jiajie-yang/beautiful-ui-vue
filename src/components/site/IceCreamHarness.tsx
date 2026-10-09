@@ -1,6 +1,8 @@
+import LanguageToggle from './LanguageToggle';
+import { t, locale } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
-import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
+import { computed, watch, type ComputedRef, type FunctionalComponent } from 'vue';
 import { createComponent, createState, templateRef, watchLifecycle, cssStyle, omitProps, teleport } from '@/lib/vue-tools';
 import type { CSSProperties, VNodeChild } from '@/lib/dom-types';
 import AgentScreen from "@/components/primitives/AgentScreen";
@@ -57,8 +59,12 @@ const StreamLine = createComponent<{
   const text = computed(() => __props.text);
   const tone = computed(() => __props.tone === undefined ? "ink" : __props.tone);
   const onDone = computed(() => __props.onDone);
-  const words = computed(() => text.value.split(" "));
+  const words = computed(() => locale.value.startsWith('zh') ? Array.from(text.value) : text.value.split(" "));
   const [n, setN] = createState(0);
+  let completed = false;
+  watch(words, (next, previous) => {
+    setN(completed ? next.length : Math.min(next.length, Math.floor(n.value / Math.max(1, previous.length) * next.length)));
+  }, { flush: 'sync' });
   const streaming = computed(() => n.value < words.value.length);
   watchLifecycle(() => {
     if (!streaming.value) return;
@@ -66,14 +72,13 @@ const StreamLine = createComponent<{
     return () => clearTimeout(t);
   }, () => [n.value, streaming.value]);
   watchLifecycle(() => {
-    if (!streaming.value) onDone.value?.();
+    if (!streaming.value && !completed) { completed = true; onDone.value?.(); }
     
   }, () => [streaming.value]);
   return () => {
     return <p class={`max-w-[620px] text-[13.5px] leading-[1.65] ${tone.value === "ink" ? "text-ink" : "text-ink-2"}`}>
       {words.value.slice(0, n.value).map((word, i) => <span key={i} class="inline">
-          {word}{" "}
-        </span>)}
+{word}{locale.value.startsWith('zh') ? "" : " "}</span>)}
       {streaming.value && <span class="stream-caret is-streaming" />}
     </p>;
   };
@@ -109,18 +114,18 @@ const OffboardingAnswer = createComponent<Record<string, never>>("OffboardingAns
   }, () => [stage.value]);
   return () => {
     return <>
-      <Reply intro="Before I archive the vendor, confirm a few details. Single questions advance on their own; multi-selects wait for the arrow.">
+      <Reply intro={t("harness.beforeIArchiveTheVendorConfirmAFewDetails")}>
         <ApprovalCard resettable={false} onSubmitted={() => setStage("thinking")} />
       </Reply>
       {stage.value === "thinking" && <div class="mt-4 flex min-h-6 items-center" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })}>
-          <LoadingState label="Archiving vendor" variant="Dots" />
+          <LoadingState label={t("harness.archivingVendor")} variant="Dots" />
         </div>}
       {stage.value === "done" && <div class="mt-4" style={cssStyle({
         animation: "fade-up 400ms cubic-bezier(0.23,1,0.32,1) both"
       })}>
-          <StreamLine text="Done — I archived Fjord Dairy, moved its 3 open orders to Northwind Creamery, and flagged the cold-chain certificate for renewal. Nothing else in the workflow references the vendor." />
+          <StreamLine text={t("harness.doneIArchivedFjordDairyMovedIts3Open")} />
         </div>}
     </>;
   };
@@ -134,7 +139,7 @@ const FindTicketAnswer = createComponent<Record<string, never>>("FindTicketAnswe
       {settled.value && <div class="mt-1" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })}>
-          <StreamLine tone="ink-2" text="Found it — the flavor page redesign ticket, plus the two docs it references. The retrieved chunks are in the side panel." />
+          <StreamLine tone="ink-2" text={t("harness.foundItTheFlavorPageRedesignTicketPlusThe")} />
         </div>}
     </>;
   };
@@ -147,7 +152,7 @@ const BrowserPane = createComponent<Record<string, never>>("BrowserPane", [], (_
     return () => clearTimeout(t);
   }, () => []);
   return () => {
-    return <AgentScreen agentName="Browser agent" variant={variant.value} />;
+    return <AgentScreen agentName={t("harness.browserAgent")} variant={variant.value} />;
   };
 });
 /* the browser flow: spin up a browser, show the plan as a thinking trace, then
@@ -161,33 +166,33 @@ const ParkingAppealAnswer = createComponent<Record<string, never>>("ParkingAppea
   }, () => [stage.value]);
   return () => {
     return <>
-      <StreamLine tone="ink-2" text="Spinning up a browser — you can watch it work in the panel on the right, or click in to take a look." onDone={() => setStage(s => s === "boot" ? "think" : s)} />
+      <StreamLine tone="ink-2" text={t("harness.spinningUpABrowserYouCanWatchItWork")} onDone={() => setStage(s => s === "boot" ? "think" : s)} />
       {stage.value !== "boot" && <div class="mt-4" style={cssStyle({
         animation: "fade-up 400ms cubic-bezier(0.23,1,0.32,1) both"
       })}>
-          <ThinkingState variant="Steps" active="Working the appeal" done="Filed the appeal" icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden>
+          <ThinkingState variant="Steps" active={t("harness.workingTheAppeal")} done={t("harness.filedTheAppeal")} icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden>
                 <circle cx="12" cy="12" r="9" />
                 <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
               </svg>} rows={[{
-          primary: "Opening the city parking portal"
+          get primary() { return t("harness.openingTheCityParkingPortal"); }
         }, {
-          primary: "Locating citation #A4471902"
+          get primary() { return t("harness.locatingCitationA4471902"); }
         }, {
-          primary: "Filling out the appeal form"
+          get primary() { return t("harness.fillingOutTheAppealForm"); }
         }, {
-          primary: "Attaching evidence",
-          secondary: "2 photos · permit"
+          get primary() { return t("harness.attachingEvidence"); },
+          get secondary() { return t("harness.label2PhotosPermit"); }
         }]} onSettled={() => setStage(s => s === "think" ? "working" : s)} />
         </div>}
       {stage.value === "working" && <div class="mt-4 flex min-h-6 items-center" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })}>
-          <LoadingState label="Submitting the appeal" variant="Dots" />
+          <LoadingState label={t("harness.submittingTheAppeal")} variant="Dots" />
         </div>}
       {stage.value === "done" && <div class="mt-4" style={cssStyle({
         animation: "fade-up 400ms cubic-bezier(0.23,1,0.32,1) both"
       })}>
-          <StreamLine text="Done — the appeal for citation #A4471902 is submitted. The city portal returned confirmation PA-6621 and it's now under review; you'll hear back within 14 days. I attached the two curb-sign photos and your resident permit as evidence." />
+          <StreamLine text={t("harness.doneTheAppealForCitationA4471902IsSubmittedThe")} />
         </div>}
     </>;
   };
@@ -214,82 +219,97 @@ type Scenario = {
 };
 const SCENARIOS: Record<string, Scenario> = {
   appeal: {
-    prompt: "Appeal my parking ticket — citation #A4471902.",
+    get prompt() { return t("harness.appealMyParkingTicketCitationA4471902"); },
     beat: 500,
-    paneTitle: "Agent",
+    get paneTitle() { return t("common.agent"); },
     Pane: () => <BrowserPane />,
     Answer: () => <ParkingAppealAnswer />
   },
   todos: {
-    prompt: "What urgent to-dos need my attention this morning?",
+    get prompt() { return t("harness.whatUrgentToDosNeedMyAttentionThisMorning"); },
     beat: 1100,
-    paneTitle: "Tasks",
+    get paneTitle() { return t("common.tasks"); },
     Pane: () => <>
         <TaskRows variant="List" />
         <div class="mt-6">
           <ContextCards />
         </div>
       </>,
-    Answer: () => <Reply intro="Three things are time-sensitive. I put the checklist in the side panel, ordered by how soon they’ll bite — and there’s one call worth making first.">
+    Answer: () => <Reply intro={t("harness.threeThingsAreTimeSensitiveIPutTheChecklist")}>
         <RecommendationCard />
       </Reply>
   },
   workload: {
-    prompt: "Prep a summary of my workload.",
+    get prompt() { return t("harness.prepASummaryOfMyWorkload"); },
     beat: 900,
     Answer: () => <WorkloadAnswer />
   },
   offboarding: {
-    prompt: "I need your approval before I off-board a supplier.",
+    get prompt() { return t("harness.iNeedYourApprovalBeforeIOffBoardA"); },
     beat: 850,
     Answer: () => <OffboardingAnswer />
   },
   "find-ticket": {
-    prompt: "There was a ticket about redesigning the flavor page — can you find it?",
+    get prompt() { return t("harness.thereWasATicketAboutRedesigningTheFlavorPage"); },
     beat: 500,
-    paneTitle: "Context",
+    get paneTitle() { return t("common.context"); },
     Pane: () => <ContextCards />,
     Answer: () => <FindTicketAnswer />
   },
   suppliers: {
-    prompt: "Show me our supplier records.",
+    get prompt() { return t("harness.showMeOurSupplierRecords"); },
     beat: 700,
-    workspaceTitle: "Suppliers",
+    get workspaceTitle() { return t("common.suppliers"); },
     Workspace: () => <RecordsTable fill />,
-    Answer: () => <StreamLine tone="ink-2" text="The grid’s on the left. Ask me to filter, enrich, or add a column — I’ll update the table live and show my work here." />
+    Answer: () => <StreamLine tone="ink-2" text={t("harness.theGridSOnTheLeftAskMeTo")} />
   },
   restock: {
-    prompt: "Draft the batch restock function.",
+    get prompt() { return t("harness.draftTheBatchRestockFunction"); },
     beat: 500,
-    Answer: () => <Reply intro="I planned it out and staged the edits. Hover a file chip to preview its diff — nothing runs until you say so.">
+    Answer: () => <Reply intro={t("harness.iPlannedItOutAndStagedTheEditsHover")}>
         <ToolChips />
       </Reply>
   },
   edits: {
-    prompt: "Propose edits to the flavor list.",
+    get prompt() { return t("harness.proposeEditsToTheFlavorList"); },
     beat: 1000,
-    Answer: () => <Reply intro="I staged the changes as a reviewable draft — nothing is applied yet. Sweep through and approve what looks right.">
+    Answer: () => <Reply intro={t("harness.iStagedTheChangesAsAReviewableDraftNothing")}>
         <DiffTable />
       </Reply>
   },
   rewrite: {
-    prompt: "Help me tighten this launch note.",
+    get prompt() { return t("harness.helpMeTightenThisLaunchNote"); },
     beat: 700,
-    Answer: () => <Reply intro="Select any passage and hand it to me. I highlighted a line below — pick an action or describe the edit.">
+    Answer: () => <Reply intro={t("harness.selectAnyPassageAndHandItToMeI")}>
         <SelectionActions />
       </Reply>
   },
   surfer: {
-    prompt: "Can you audit the launch plan—and put Subway Surfers underneath so my attention span stays on payroll?",
+    get prompt() { return t("harness.canYouAuditTheLaunchPlanAndPutSubway"); },
     beat: 18000,
     loadingVariant: "Surfer",
-    Answer: () => <Reply intro="All done. Thanks for locking in with me." />
+    Answer: () => <Reply intro={t("harness.allDoneThanksForLockingInWithMe")} />
   }
 };
 type ScenarioId = keyof typeof SCENARIOS;
 const KEYWORDS: [ScenarioId, string[]][] = [["appeal", ["appeal", "parking", "citation", "contest", "dispute", "fine", "browser"]], ["todos", ["todo", "to-do", "urgent", "morning", "attention", "task"]], ["workload", ["summary", "summarize", "workload", "overview", "recap", "digest"]], ["offboarding", ["approve", "approval", "off-board", "offboard", "confirm", "sign off"]], ["find-ticket", ["find", "search", "ticket", "where", "look up", "locate"]], ["suppliers", ["supplier", "records", "vendor", "table", "maker", "grid"]], ["restock", ["restock", "code", "function", "batch", "script", "reorder"]], ["edits", ["edit", "diff", "change", "propose", "update the", "flavor list"]], ["rewrite", ["rewrite", "tighten", "reword", "shorten", "note", "copy"]]];
+const CHINESE_KEYWORDS: [ScenarioId, string[]][] = [
+  ["appeal", ["申诉", "停车", "罚单"]],
+  ["offboarding", ["停用", "归档", "审批", "批准"]],
+  ["find-ticket", ["工单", "查找", "寻找"]],
+  ["suppliers", ["供应商", "供应记录", "表格"]],
+  ["restock", ["补货", "函数", "代码"]],
+  ["edits", ["口味列表", "修改建议", "编辑"]],
+  ["rewrite", ["精简", "改写", "发布说明"]],
+  ["todos", ["待办", "紧急", "任务"]],
+  ["workload", ["摘要", "总结", "工作量"]],
+  ["surfer", ["跑酷"]],
+];
 function matchScenario(text: string): ScenarioId {
   const lower = text.toLowerCase();
+  for (const [id, words] of CHINESE_KEYWORDS) {
+    if (words.some(word => lower.includes(word))) return id;
+  }
   for (const [id, words] of KEYWORDS) {
     if (words.some(word => lower.includes(word))) return id;
   }
@@ -322,59 +342,69 @@ const SUGGESTION_POOL: {
   label: string;
 }[] = [{
   id: "appeal",
-  label: "Appeal my parking ticket"
+  get label() { return t("harness.appealMyParkingTicket"); }
 }, {
   id: "suppliers",
-  label: "Show me our supplier records"
+  get label() { return t("harness.showMeOurSupplierRecords2"); }
 }, {
   id: "todos",
-  label: "What urgent to-dos need my attention this morning?"
+  get label() { return t("harness.whatUrgentToDosNeedMyAttentionThisMorning"); }
 }, {
   id: "workload",
-  label: "Prep a summary of my workload"
+  get label() { return t("harness.prepASummaryOfMyWorkload2"); }
 }, {
   id: "find-ticket",
-  label: "Find the ticket about the flavor page redesign"
+  get label() { return t("harness.findTheTicketAboutTheFlavorPageRedesign"); }
 }, {
   id: "restock",
-  label: "Draft the batch restock function"
+  get label() { return t("harness.draftTheBatchRestockFunction2"); }
 }, {
   id: "rewrite",
-  label: "Tighten this launch note"
+  get label() { return t("harness.tightenThisLaunchNote"); }
 }];
 const RECENTS: {
   id: ScenarioId;
   label: string;
   prompt?: string;
+  searchText?: string;
 }[] = [{
   id: "appeal",
-  label: "Parking ticket appeal",
-  prompt: SCENARIOS.appeal.prompt
+  get label() { return t("harness.parkingTicketAppeal"); },
+  get searchText() { return t("harness.parkingTicketAppeal", {}, { locale: "en" }); },
+  get prompt() { return SCENARIOS.appeal.prompt; }
 }, {
   id: "suppliers",
-  label: "Supplier records"
+  get label() { return t("common.supplierRecords"); },
+  get searchText() { return t("common.supplierRecords", {}, { locale: "en" }); }
 }, {
   id: "todos",
-  label: "Urgent to-dos this morning"
+  get label() { return t("common.urgentToDosThisMorning"); },
+  get searchText() { return t("common.urgentToDosThisMorning", {}, { locale: "en" }); }
 }, {
   id: "find-ticket",
-  label: "Flavor page ticket"
+  get label() { return t("common.flavorPageTicket"); },
+  get searchText() { return t("common.flavorPageTicket", {}, { locale: "en" }); }
 }, {
   id: "workload",
-  label: "Workload summary"
+  get label() { return t("common.workloadSummary"); },
+  get searchText() { return t("common.workloadSummary", {}, { locale: "en" }); }
 }, {
   id: "offboarding",
-  label: "Off-board a supplier"
+  get label() { return t("common.offBoardASupplier"); },
+  get searchText() { return t("common.offBoardASupplier", {}, { locale: "en" }); }
 }, {
   id: "restock",
-  label: "Batch restock function"
+  get label() { return t("common.batchRestockFunction"); },
+  get searchText() { return t("common.batchRestockFunction", {}, { locale: "en" }); }
 }, {
   id: "edits",
-  label: "Propose flavor edits"
+  get label() { return t("common.proposeFlavorEdits"); },
+  get searchText() { return t("common.proposeFlavorEdits", {}, { locale: "en" }); }
 }, {
   id: "surfer",
-  label: "Subway surfing",
-  prompt: SCENARIOS.surfer.prompt
+  get label() { return t("common.subwaySurfing"); },
+  get searchText() { return t("common.subwaySurfing", {}, { locale: "en" }); },
+  get prompt() { return SCENARIOS.surfer.prompt; }
 }];
 
 /* ── the agent reply — thinks, then builds the answer ─────── */
@@ -399,7 +429,7 @@ const AssistantResponse = createComponent<{
       })}>{scenario.value.Answer()}</div> : <div class="flex min-h-6 items-center" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })}>
-          {scenario.value.loadingVariant === "Surfer" ? <LoadingState variant="Surfer" /> : <LoadingState label="Thinking" variant="Dots" />}
+          {scenario.value.loadingVariant === "Surfer" ? <LoadingState variant="Surfer" /> : <LoadingState label={t("common.thinking")} variant="Dots" />}
         </div>}
     </article>;
   };
@@ -491,13 +521,13 @@ const EmptyState = createComponent<{
   return () => {
     return <div class="mx-auto flex min-h-full max-w-[720px] flex-col justify-center px-4 py-10 sm:px-8">
       <h1 class="text-[26px] font-normal tracking-[-0.02em] text-ink">
-        <span class="home-reveal block text-ink-3" style={cssStyle(homeRevealStyle(stage.value >= 1, revealParams.reveal))}>Hello {NAME}</span>
-        <span class="home-reveal block" style={cssStyle(homeRevealStyle(stage.value >= 2, revealParams.reveal))}>What can I help you with?</span>
+        <span class="home-reveal block text-ink-3" style={cssStyle(homeRevealStyle(stage.value >= 1, revealParams.reveal))}>{(t("harness.hello") + " ")} {NAME}</span>
+        <span class="home-reveal block" style={cssStyle(homeRevealStyle(stage.value >= 2, revealParams.reveal))}>{t("harness.whatCanIHelpYouWith")}</span>
       </h1>
 
       <div class="home-reveal relative mt-7" style={cssStyle(homeRevealStyle(stage.value >= 3, revealParams.reveal))}>
         <div class="relative">
-          <PromptBar demo={false} tall placeholder="Ask anything about your creamery ops…" onSend={text => onSend.value(text, matchScenario(text))} />
+          <PromptBar demo={false} tall placeholder={t("harness.askAnythingAboutYourCreameryOps")} onSend={text => onSend.value(text, matchScenario(text))} />
         </div>
       </div>
 
@@ -513,13 +543,11 @@ const EmptyState = createComponent<{
         <div class="mt-1 flex items-center gap-5 pl-0.5 text-[13px] text-ink-3">
           <button type="button" class="flex items-center gap-2 py-1 transition-colors duration-150 hover:text-ink">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden><circle cx="5" cy="12" r="1.7" /><circle cx="12" cy="12" r="1.7" /><circle cx="19" cy="12" r="1.7" /></svg>
-            Connect your apps for a better experience
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            {t("harness.connectYourAppsForABetterExperience")}<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M5 12h14M13 6l6 6-6 6" /></svg>
           </button>
           <button type="button" onClick={shuffle.value} class="flex items-center gap-2 py-1 transition-colors duration-150 hover:text-ink">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" /></svg>
-            Shuffle suggestions
-          </button>
+            {t("harness.shuffleSuggestions")}</button>
         </div>
       </div>
     </div>;
@@ -537,6 +565,7 @@ type Msg = {
 };
 type Chat = {
   id: number;
+  recentId?: ScenarioId;
   title: string | null;
   messages: Msg[];
 };
@@ -559,7 +588,7 @@ const PaneBody = createComponent<{
   return () => {
     if (!show.value) {
       return <div class="flex h-full items-center justify-center pb-10">
-        <LoadingState label="Gathering" variant="Dots" />
+        <LoadingState label={t("harness.gathering")} variant="Dots" />
       </div>;
     }
     return <div style={cssStyle({
@@ -572,19 +601,19 @@ const PaneBody = createComponent<{
  * from the assistant chat to a Property configuration inspector.
  */
 const SPREADSHEET_VIEWS = [{
-  name: "Main",
+  id: "main", get name() { return t("harness.main"); },
   color: "var(--ink-3)",
   count: 60
 }, {
-  name: "Gelato",
+  id: "gelato", get name() { return t("common.gelato"); },
   color: "oklch(0.627 0.23 296.668)",
   count: 17
 }, {
-  name: "Wholesale",
+  id: "wholesale", get name() { return t("common.wholesale"); },
   color: "oklch(0.611 0.21 263.944)",
   count: 12
 }, {
-  name: "Dairy-free",
+  id: "dairy-free", get name() { return t("common.dairyFree"); },
   color: "oklch(0.671 0.118 219.351)",
   count: 9
 }];
@@ -595,7 +624,7 @@ const ConfigSwitch = createComponent<{
   const on = computed(() => __props.on);
   const onToggle = computed(() => __props.onToggle);
   return () => {
-    return <button type="button" role="switch" aria-checked={on.value} onClick={onToggle.value} class="relative h-4.5 w-7.5 shrink-0 rounded-full transition-colors duration-150" style={cssStyle({
+    return <button type="button" role="switch" aria-label={t("common.grounding")} aria-checked={on.value} onClick={onToggle.value} class="relative h-4.5 w-7.5 shrink-0 rounded-full transition-colors duration-150" style={cssStyle({
       background: on.value ? "var(--accent)" : "var(--line-strong)"
     })}>
       <span class="absolute top-0.5 left-0.5 size-3.5 rounded-full bg-white shadow-btn transition-transform duration-150" style={cssStyle({
@@ -617,59 +646,55 @@ const PropertyConfig = createComponent<{
       animation: "fade-in 160ms ease-out both"
     })}>
       <div class="flex h-11 shrink-0 items-center justify-between border-b border-line px-3 sm:pl-4">
-        <span class="text-[13px] font-semibold text-ink">Property configuration</span>
+        <span class="text-[13px] font-semibold text-ink">{t("harness.propertyConfiguration")}</span>
         <div class="flex items-center gap-0.5 text-ink-3">
-          <button type="button" aria-label="Previous" class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+          <button type="button" aria-label={t("harness.previous")} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M15 6l-6 6 6 6" /></svg>
           </button>
-          <button type="button" aria-label="Next" class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+          <button type="button" aria-label={t("harness.next")} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M9 6l6 6-6 6" /></svg>
           </button>
-          <button type="button" aria-label="Back to chat" onClick={onClose.value} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+          <button type="button" aria-label={t("harness.backToChat")} onClick={onClose.value} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
         </div>
       </div>
 
       <div class="min-h-0 flex-1 overflow-y-auto p-4">
-        <div class="text-[14px] font-semibold text-ink">{view.value} suppliers</div>
+        <div class="text-[14px] font-semibold text-ink">{t("harness.label0Suppliers", [view.value])}</div>
 
         <div class="mt-4 flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <span class="text-[13px] text-ink-3">Type</span>
+            <span class="text-[13px] text-ink-3">{t("common.type")}</span>
             <span class="flex items-center gap-1.5 text-[13px] font-medium text-ink">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M4 6h16M4 12h10M4 18h7" /></svg>
-              View filter
-            </span>
+              {t("harness.viewFilter")}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-[13px] text-ink-3">Model</span>
+            <span class="text-[13px] text-ink-3">{t("common.model")}</span>
             <span class="flex items-center gap-1.5 text-[13px] font-medium text-ink">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--accent)" aria-hidden><path d="M12 3l1.7 5.1a2 2 0 0 0 1.2 1.2L20 11l-5.1 1.7a2 2 0 0 0-1.2 1.2L12 19l-1.7-5.1a2 2 0 0 0-1.2-1.2L4 11l5.1-1.7a2 2 0 0 0 1.2-1.2z" /></svg>
-              Sprinkles 5
-            </span>
+              {"Sprinkles 5"}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-[13px] text-ink-3">Grounding</span>
+            <span class="text-[13px] text-ink-3">{t("common.grounding")}</span>
             <ConfigSwitch on={grounding.value} onToggle={() => setGrounding(v => !v)} />
           </div>
         </div>
 
         <div class="mt-4 rounded-[10px] bg-inset p-3 text-[13px] leading-relaxed text-ink-2 shadow-hairline">
-          Only surface <span class="rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{view.value}</span> suppliers with a strong, recent connection — nothing else.
-        </div>
+          {(t("harness.onlySurface") + " ")}<span class="rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{view.value}</span>{(" " + t("harness.suppliersWithAStrongRecentConnectionNothingElse"))}</div>
 
         <button type="button" class="mt-3 flex h-9 w-full items-center justify-center gap-2 rounded-[9px] text-[12.5px] font-medium text-ink shadow-btn transition-[background-color,transform] duration-150 hover:bg-hover active:scale-[0.98]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" /></svg>
-          Recompute stale fields
-        </button>
+          {t("harness.recomputeStaleFields")}</button>
 
         <div class="mt-6 flex flex-col gap-1">
           {[{
-            label: "Use webhooks to integrate with other tools",
+            get label() { return t("harness.useWebhooksToIntegrateWithOtherTools"); },
             icon: <path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9Z" />
           }, {
-            label: "Configure a Zapier integration",
+            get label() { return t("harness.configureAZapierIntegration"); },
             icon: <path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9Z" />
           }].map(row => <button key={row.label} type="button" class="-mx-1.5 flex items-center gap-2.5 rounded-[8px] px-1.5 py-2 text-left text-[13px] text-ink transition-colors duration-100 hover:bg-hover">
               <span class="text-accent"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden>{row.icon}</svg></span>
@@ -679,8 +704,7 @@ const PropertyConfig = createComponent<{
 
         <button type="button" class="mt-4 flex h-9 w-full items-center justify-center gap-2 rounded-[9px] bg-red-tint text-[12.5px] font-medium text-red transition-[filter,transform] duration-150 hover:brightness-95 active:scale-[0.98]">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" /></svg>
-          Delete property
-        </button>
+          {t("harness.deleteProperty")}</button>
       </div>
     </div>;
   };
@@ -739,7 +763,7 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
    * fresh chat unless the current one is empty */
   const [replay, setReplay] = createState<Record<number, number>>({});
   const pickRecent = (scenarioId: ScenarioId, label: string, prompt = label) => {
-    const existing = chats.value.find(c => c.title === label);
+    const existing = chats.value.find(c => c.recentId === scenarioId);
     if (existing) {
       if (prompt !== label) {
         setChats(current => current.map(c => c.id === existing.id ? {
@@ -760,6 +784,7 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
     if (chat.value.messages.length === 0) {
       setChats(current => current.map(c => c.id === chat.value.id ? appendExchange({
         ...c,
+        recentId: scenarioId,
         title: label
       }, prompt, scenarioId) : c));
       return;
@@ -767,6 +792,7 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
     const id = chatIdRef.value += 1;
     setChats(current => [...current, appendExchange({
       id,
+      recentId: scenarioId,
       title: label,
       messages: []
     }, prompt, scenarioId)]);
@@ -874,11 +900,11 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
           <button type="button" aria-pressed={c.id === activeId.value} onClick={() => setActiveId(c.id)} title={c.title ?? "New chat"} class="min-w-0 flex-1 text-left">
             <span class="block truncate">{c.title ?? "New chat"}</span>
           </button>
-          <button type="button" aria-label="Close tab" onClick={() => closeChat(c.id)} class="-my-1 flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-[background-color,color] duration-100 hover:bg-hover-2 hover:text-ink">
+          <button type="button" aria-label={t("harness.closeTab")} onClick={() => closeChat(c.id)} class="-my-1 flex size-6 shrink-0 items-center justify-center rounded-[5px] text-ink-3 transition-[background-color,color] duration-100 hover:bg-hover-2 hover:text-ink">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
         </div>)}
-      <button type="button" aria-label="New chat" onClick={newChat} class="ml-0.5 flex size-7 shrink-0 items-center justify-center rounded-[7px] text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
+      <button type="button" aria-label={t("common.newChat")} onClick={newChat} class="ml-0.5 flex size-7 shrink-0 items-center justify-center rounded-[7px] text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden><path d="M12 5v14M5 12h14" /></svg>
       </button>
     </div>);
@@ -910,15 +936,16 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
       {/* the composer floats over the thread; content scrolls behind it */}
       <div ref={composerRef} class={`absolute inset-x-0 bottom-0 ${narrow ? "p-3" : "px-4 pb-6 sm:px-8 lg:px-12"}`}>
         <div class={narrow ? "" : "mx-auto max-w-[720px]"}>
-          <PromptBar demo={false} tall placeholder="Reply" onSend={text => send(text, matchScenario(text))} />
+          <PromptBar demo={false} tall placeholder={t("harness.reply")} onSend={text => send(text, matchScenario(text))} />
         </div>
       </div>
     </div>;
   return () => {
     return <main class="flex h-[100dvh] gap-0 bg-canvas p-2.5 text-ink lg:pl-0">
-      <SidebarNav fill className="hidden lg:flex" recents={RECENTS} activeTitle={chat.value.title} onPick={(id, label, prompt) => pickRecent(id as ScenarioId, label, prompt)} onNewChat={newChat} footerLabel="Fork this" onFooterClick={() => setUseOpen(true)} />
+      <SidebarNav fill className="hidden lg:flex" recents={RECENTS} activeRecentId={chat.value.recentId ?? null} onPick={(id, label, prompt) => pickRecent(id as ScenarioId, label, prompt)} onNewChat={newChat} footerLabel={t("harness.forkThis")} onFooterClick={() => setUseOpen(true)} />
 
       <div class="flex min-w-0 flex-1 flex-col gap-2.5">
+        <header class="flex shrink-0 items-center justify-between gap-2 px-2"><a href="/" class="text-[12px] text-ink-2 hover:text-ink">{t("common.components")}</a><LanguageToggle /></header>
         {/* panels row — main pane + docked side pane */}
         <div class="flex min-h-0 flex-1 gap-2.5">
           {workspaceScenario.value ? <>
@@ -930,18 +957,16 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
                 <div class="flex h-10 shrink-0 items-center gap-1 overflow-x-auto border-t border-line px-2">
                   <button type="button" class="flex h-7 shrink-0 items-center gap-1.5 rounded-[7px] px-2.5 text-[12.5px] font-medium text-ink-2 transition-colors duration-100 hover:bg-hover hover:text-ink">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M4 6h16M7 12h10M10 18h4" /></svg>
-                    Sort &amp; filter
-                  </button>
+                    {t("harness.sortFilter")}</button>
                   <span class="mx-1 h-4 w-px shrink-0 bg-line" />
-                  {SPREADSHEET_VIEWS.map(v => <button key={v.name} type="button" aria-pressed={propView.value === v.name} onClick={() => setPropView(current => current === v.name ? null : v.name)} class={`flex h-7 shrink-0 items-center gap-1.5 rounded-[7px] px-2.5 text-[12.5px] font-medium transition-colors duration-100 ${propView.value === v.name ? "bg-hover-2 text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"}`}>
+                  {SPREADSHEET_VIEWS.map(v => <button key={v.id} type="button" aria-pressed={propView.value === v.id} onClick={() => setPropView(current => current === v.id ? null : v.id)} class={`flex h-7 shrink-0 items-center gap-1.5 rounded-[7px] px-2.5 text-[12.5px] font-medium transition-colors duration-100 ${propView.value === v.id ? "bg-hover-2 text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"}`}>
                       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={v.color} stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden class="shrink-0"><rect x="3.5" y="3.5" width="17" height="17" rx="3" /><path d="M3.5 9.5h17M9.5 9.5v11" /></svg>
                       {v.name}
                       <span class="text-[11px] tabular-nums text-ink-3">{v.count}</span>
                     </button>)}
                   <button type="button" class="ml-0.5 flex h-7 shrink-0 items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden><path d="M12 5v14M5 12h14" /></svg>
-                    New view
-                  </button>
+                    {t("harness.newView")}</button>
                 </div>
               </section>
 
@@ -949,9 +974,9 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
               <aside class="hidden w-[400px] shrink-0 flex-col overflow-hidden rounded-[14px] border border-line bg-page lg:flex" style={cssStyle({
               animation: "fade-up 400ms cubic-bezier(0.23,1,0.32,1) both"
             })}>
-                {propView.value ? <PropertyConfig view={propView.value} onClose={() => setPropView(null)} /> : <>
+                {propView.value ? <PropertyConfig view={SPREADSHEET_VIEWS.find(item => item.id === propView.value)?.name ?? propView.value} onClose={() => setPropView(null)} /> : <>
                     <div class="flex h-11 shrink-0 items-center border-b border-line px-4">
-                      <span class="text-[13px] font-semibold text-ink">Chat</span>
+                      <span class="text-[13px] font-semibold text-ink">{t("common.chat")}</span>
                     </div>
                     {renderThread(true)}
                   </>}
@@ -971,16 +996,16 @@ const IceCreamHarness = createComponent<Record<string, never>>("IceCreamHarness"
                     <div class="flex h-11 shrink-0 items-center justify-between border-b border-line px-3 sm:pl-4">
                       <span class="text-[13px] font-semibold text-ink">{paneScenario.value.paneTitle}</span>
                       <div class="flex items-center gap-0.5 text-ink-3">
-                        <button type="button" aria-label="Previous" class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+                        <button type="button" aria-label={t("harness.previous")} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M15 6l-6 6 6 6" /></svg>
                         </button>
-                        <button type="button" aria-label="Next" class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+                        <button type="button" aria-label={t("harness.next")} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M9 6l6 6-6 6" /></svg>
                         </button>
-                        <button type="button" aria-label="Pane options" class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+                        <button type="button" aria-label={t("harness.paneOptions")} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden><circle cx="5" cy="12" r="1.6" /><circle cx="12" cy="12" r="1.6" /><circle cx="19" cy="12" r="1.6" /></svg>
                         </button>
-                        <button type="button" aria-label="Close pane" onClick={() => setClosedPaneId(paneMsg.value!.id)} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
+                        <button type="button" aria-label={t("harness.closePane")} onClick={() => setClosedPaneId(paneMsg.value!.id)} class="flex size-6 items-center justify-center rounded-[6px] transition-colors duration-100 hover:bg-hover hover:text-ink">
                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
                         </button>
                       </div>

@@ -1,3 +1,4 @@
+import { t, locale } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -29,22 +30,22 @@ const STRENGTH: Record<Strength, {
   rank: number;
 }> = {
   strong: {
-    label: "Very strong",
+    get label() { return t("recordsTable.veryStrong"); },
     color: "var(--green)",
     rank: 3
   },
   weak: {
-    label: "Weak",
+    get label() { return t("recordsTable.weak"); },
     color: "var(--orange)",
     rank: 2
   },
   veryweak: {
-    label: "Very weak",
+    get label() { return t("recordsTable.veryWeak"); },
     color: "var(--red)",
     rank: 1
   },
   none: {
-    label: "No communication",
+    get label() { return t("recordsTable.noCommunication"); },
     color: "var(--ink-3)",
     rank: 0
   }
@@ -110,11 +111,12 @@ export type RecordRow = {
   strength: Strength;
   website?: string;
 };
-const INITIAL_ROWS: RecordRow[] = [{
+const INITIAL_ROWS: (RecordRow & { lastLabel: string })[] = [{
   id: "aurora",
   name: "Aurora Scoops — Reykjavík",
   tags: ["Gelato", "Seasonal"],
   last: "9 days ago",
+  get lastLabel() { return t("recordsTable.label9DaysAgo"); },
   strength: "strong",
   website: "aurora-scoops.example.com"
 }, {
@@ -122,6 +124,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Kumo Creamery — Tokyo",
   tags: ["B2C", "Cafe", "Vegan"],
   last: "3 weeks ago",
+  get lastLabel() { return t("recordsTable.label3WeeksAgo"); },
   strength: "strong",
   website: "kumo-creamery.example.com"
 }, {
@@ -129,6 +132,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Sol y Nieve — Buenos Aires",
   tags: ["Gelato", "Local"],
   last: "2 months ago",
+  get lastLabel() { return t("recordsTable.label2MonthsAgo"); },
   strength: "weak",
   website: "sol-y-nieve.example.com"
 }, {
@@ -136,6 +140,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Maple Orbit — Montréal",
   tags: ["B2B", "Wholesale", "Seasonal"],
   last: "15 days ago",
+  get lastLabel() { return t("recordsTable.label15DaysAgo"); },
   strength: "weak",
   website: "maple-orbit.example.com"
 }, {
@@ -143,6 +148,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Blue Fig Gelato — Florence",
   tags: ["Gelato", "Cafe"],
   last: "over 1 year ago",
+  get lastLabel() { return t("recordsTable.over1YearAgo"); },
   strength: "veryweak",
   website: "blue-fig.example.com"
 }, {
@@ -150,12 +156,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Sahara Swirl — Marrakech",
   tags: ["Sorbet", "Local"],
   last: "5 months ago",
+  get lastLabel() { return t("recordsTable.label5MonthsAgo"); },
   strength: "veryweak"
 }, {
   id: "cloudberry",
   name: "Cloudberry Cone — Helsinki",
   tags: ["Dairy-free", "Seasonal"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none",
   website: "cloudberry-cone.example.com"
 }, {
@@ -163,6 +171,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Palm Sugar Creamery — Bangkok",
   tags: ["B2C", "Vegan"],
   last: "3 months ago",
+  get lastLabel() { return t("recordsTable.label3MonthsAgo"); },
   strength: "veryweak",
   website: "palm-sugar.example.com"
 }, {
@@ -170,6 +179,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Cape Vanilla Co. — Cape Town",
   tags: ["Wholesale", "Imports"],
   last: "over 1 year ago",
+  get lastLabel() { return t("recordsTable.over1YearAgo"); },
   strength: "veryweak",
   website: "cape-vanilla.example.com"
 }, {
@@ -177,12 +187,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Andes Snow Creamery — Quito",
   tags: ["Gelato", "Catering"],
   last: "almost 2 years ago",
+  get lastLabel() { return t("recordsTable.almost2YearsAgo"); },
   strength: "veryweak"
 }, {
   id: "tasman-sea",
   name: "Tasman Sea Gelato — Hobart",
   tags: ["Gelato", "Local"],
   last: "2 months ago",
+  get lastLabel() { return t("recordsTable.label2MonthsAgo"); },
   strength: "weak",
   website: "tasman-sea.example.com"
 }, {
@@ -190,6 +202,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Silk Road Sorbet — Tbilisi",
   tags: ["Sorbet", "Imports"],
   last: "about 1 month ago",
+  get lastLabel() { return t("recordsTable.about1MonthAgo"); },
   strength: "weak",
   website: "silk-road.example.com"
 }, {
@@ -197,12 +210,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Rosewater Kulfi — Jaipur",
   tags: ["B2C", "Seasonal"],
   last: "2 months ago",
+  get lastLabel() { return t("recordsTable.label2MonthsAgo"); },
   strength: "veryweak"
 }, {
   id: "lumen",
   name: "Lumen Soft Serve — Copenhagen",
   tags: ["Dairy-free", "Cafe"],
   last: "8 months ago",
+  get lastLabel() { return t("recordsTable.label8MonthsAgo"); },
   strength: "weak",
   website: "lumen-soft-serve.example.com"
 }, {
@@ -210,6 +225,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Cacao Norte — Oaxaca",
   tags: ["B2B", "Local", "Wholesale"],
   last: "about 2 years ago",
+  get lastLabel() { return t("recordsTable.about2YearsAgo"); },
   strength: "none",
   website: "cacao-norte.example.com"
 }, {
@@ -217,12 +233,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Pine & Pistachio — Istanbul",
   tags: ["Gelato", "Catering"],
   last: "about 1 month ago",
+  get lastLabel() { return t("recordsTable.about1MonthAgo"); },
   strength: "veryweak"
 }, {
   id: "ember-cone",
   name: "Ember Cone Company — Seoul",
   tags: ["B2C", "Vegan"],
   last: "15 days ago",
+  get lastLabel() { return t("recordsTable.label15DaysAgo"); },
   strength: "weak",
   website: "ember-cone.example.com"
 }, {
@@ -230,6 +248,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Coral Coast Sorbet — Honolulu",
   tags: ["Sorbet", "Local"],
   last: "9 days ago",
+  get lastLabel() { return t("recordsTable.label9DaysAgo"); },
   strength: "strong",
   website: "coral-coast.example.com"
 }, {
@@ -237,6 +256,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Sunbird Gelateria — Lisbon",
   tags: ["Gelato", "Cafe"],
   last: "over 2 years ago",
+  get lastLabel() { return t("recordsTable.over2YearsAgo"); },
   strength: "none",
   website: "sunbird.example.com"
 }, {
@@ -244,6 +264,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Mooncake Ice Cream — Singapore",
   tags: ["B2B", "Wholesale"],
   last: "about 1 month ago",
+  get lastLabel() { return t("recordsTable.about1MonthAgo"); },
   strength: "veryweak",
   website: "mooncake-ice-cream.example.com"
 }, {
@@ -251,12 +272,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Juniper & Cream — Vancouver",
   tags: ["Dairy-free", "Catering"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }, {
   id: "mango-moon",
   name: "Mango Moon Gelato — Nairobi",
   tags: ["Sorbet", "Vegan"],
   last: "almost 2 years ago",
+  get lastLabel() { return t("recordsTable.almost2YearsAgo"); },
   strength: "veryweak",
   website: "mango-moon.example.com"
 }, {
@@ -264,12 +287,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Fjord Fizz Ice — Oslo",
   tags: ["Dairy-free", "Seasonal"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }, {
   id: "pampa",
   name: "Pampa Creamery — Córdoba",
   tags: ["B2C", "Local"],
   last: "12 months ago",
+  get lastLabel() { return t("recordsTable.label12MonthsAgo"); },
   strength: "veryweak",
   website: "pampa-creamery.example.com"
 }, {
@@ -277,12 +302,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Lotus Leaf Scoops — Hanoi",
   tags: ["Vegan", "Cafe"],
   last: "15 days ago",
+  get lastLabel() { return t("recordsTable.label15DaysAgo"); },
   strength: "weak"
 }, {
   id: "saffron-sky",
   name: "Saffron Sky Kulfi — Dubai",
   tags: ["Imports", "Catering"],
   last: "almost 2 years ago",
+  get lastLabel() { return t("recordsTable.almost2YearsAgo"); },
   strength: "veryweak",
   website: "saffron-sky.example.com"
 }, {
@@ -290,6 +317,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Alpine Churn — Zürich",
   tags: ["B2B", "Gelato", "Wholesale"],
   last: "4 days ago",
+  get lastLabel() { return t("recordsTable.label4DaysAgo"); },
   strength: "strong",
   website: "alpine-churn.example.com"
 }, {
@@ -297,6 +325,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Monsoon Mango — Mumbai",
   tags: ["Sorbet", "Vegan", "Catering"],
   last: "18 days ago",
+  get lastLabel() { return t("recordsTable.label18DaysAgo"); },
   strength: "weak",
   website: "monsoon-mango.example.com"
 }, {
@@ -304,6 +333,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Cedar Spoon — Beirut",
   tags: ["Cafe", "Local", "Seasonal"],
   last: "6 days ago",
+  get lastLabel() { return t("recordsTable.label6DaysAgo"); },
   strength: "strong",
   website: "cedar-spoon.example.com"
 }, {
@@ -311,6 +341,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Baltic Berry — Tallinn",
   tags: ["Dairy-free", "Seasonal", "B2C"],
   last: "5 weeks ago",
+  get lastLabel() { return t("recordsTable.label5WeeksAgo"); },
   strength: "weak",
   website: "baltic-berry.example.com"
 }, {
@@ -318,6 +349,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Delta Dairy Works — New Orleans",
   tags: ["B2B", "Wholesale", "Local"],
   last: "2 days ago",
+  get lastLabel() { return t("recordsTable.label2DaysAgo"); },
   strength: "strong",
   website: "delta-dairy.example.com"
 }, {
@@ -325,6 +357,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Yuzu Yard — Kyoto",
   tags: ["Sorbet", "Cafe", "Seasonal"],
   last: "11 days ago",
+  get lastLabel() { return t("recordsTable.label11DaysAgo"); },
   strength: "strong",
   website: "yuzu-yard.example.com"
 }, {
@@ -332,6 +365,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Copper Cone — Melbourne",
   tags: ["Gelato", "Cafe", "B2C"],
   last: "about 1 month ago",
+  get lastLabel() { return t("recordsTable.about1MonthAgo"); },
   strength: "weak",
   website: "copper-cone.example.com"
 }, {
@@ -339,12 +373,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Mint Medina — Tunis",
   tags: ["Dairy-free", "Vegan", "Local"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }, {
   id: "glacier-grove",
   name: "Glacier Grove — Anchorage",
   tags: ["Seasonal", "Local", "Catering"],
   last: "7 weeks ago",
+  get lastLabel() { return t("recordsTable.label7WeeksAgo"); },
   strength: "weak",
   website: "glacier-grove.example.com"
 }, {
@@ -352,6 +388,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Orchard Cloud — Lyon",
   tags: ["Gelato", "Seasonal", "Cafe"],
   last: "5 days ago",
+  get lastLabel() { return t("recordsTable.label5DaysAgo"); },
   strength: "strong",
   website: "orchard-cloud.example.com"
 }, {
@@ -359,6 +396,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Tamarind Tide — Chennai",
   tags: ["Vegan", "Sorbet", "B2C"],
   last: "9 months ago",
+  get lastLabel() { return t("recordsTable.label9MonthsAgo"); },
   strength: "veryweak",
   website: "tamarind-tide.example.com"
 }, {
@@ -366,12 +404,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Amber Scoop — Prague",
   tags: ["Gelato", "B2B"],
   last: "over 1 year ago",
+  get lastLabel() { return t("recordsTable.over1YearAgo"); },
   strength: "none"
 }, {
   id: "boreal-batch",
   name: "Boreal Batch — Yellowknife",
   tags: ["Dairy-free", "Local", "Seasonal"],
   last: "8 days ago",
+  get lastLabel() { return t("recordsTable.label8DaysAgo"); },
   strength: "strong",
   website: "boreal-batch.example.com"
 }, {
@@ -379,6 +419,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Coconut Commons — Manila",
   tags: ["Vegan", "B2C", "Cafe"],
   last: "24 days ago",
+  get lastLabel() { return t("recordsTable.label24DaysAgo"); },
   strength: "weak",
   website: "coconut-commons.example.com"
 }, {
@@ -386,6 +427,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Dolomite Dairy — Bolzano",
   tags: ["Gelato", "Wholesale"],
   last: "3 days ago",
+  get lastLabel() { return t("recordsTable.label3DaysAgo"); },
   strength: "strong",
   website: "dolomite-dairy.example.com"
 }, {
@@ -393,6 +435,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Equator Cream — Kampala",
   tags: ["B2B", "Catering", "Local"],
   last: "10 months ago",
+  get lastLabel() { return t("recordsTable.label10MonthsAgo"); },
   strength: "veryweak",
   website: "equator-cream.example.com"
 }, {
@@ -400,6 +443,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Hibiscus House — Accra",
   tags: ["Sorbet", "Cafe"],
   last: "6 weeks ago",
+  get lastLabel() { return t("recordsTable.label6WeeksAgo"); },
   strength: "weak",
   website: "hibiscus-house.example.com"
 }, {
@@ -407,6 +451,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Lagoon Ladle — Venice",
   tags: ["Gelato", "Seasonal", "Catering"],
   last: "7 days ago",
+  get lastLabel() { return t("recordsTable.label7DaysAgo"); },
   strength: "strong",
   website: "lagoon-ladle.example.com"
 }, {
@@ -414,12 +459,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Midnight Milk — Tromsø",
   tags: ["Dairy-free", "Vegan", "Wholesale"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }, {
   id: "nomad-nougat",
   name: "Nomad Nougat — Ulaanbaatar",
   tags: ["Imports", "B2B"],
   last: "almost 2 years ago",
+  get lastLabel() { return t("recordsTable.almost2YearsAgo"); },
   strength: "none",
   website: "nomad-nougat.example.com"
 }, {
@@ -427,6 +474,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Olive Snow — Athens",
   tags: ["Gelato", "Cafe", "Local"],
   last: "4 days ago",
+  get lastLabel() { return t("recordsTable.label4DaysAgo"); },
   strength: "strong",
   website: "olive-snow.example.com"
 }, {
@@ -434,6 +482,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Pacific Pear — Valparaíso",
   tags: ["Sorbet", "Seasonal"],
   last: "2 months ago",
+  get lastLabel() { return t("recordsTable.label2MonthsAgo"); },
   strength: "weak",
   website: "pacific-pear.example.com"
 }, {
@@ -441,6 +490,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Quartz Cone — Denver",
   tags: ["B2C", "Wholesale"],
   last: "10 days ago",
+  get lastLabel() { return t("recordsTable.label10DaysAgo"); },
   strength: "strong",
   website: "quartz-cone.example.com"
 }, {
@@ -448,6 +498,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Red Lantern Creamery — Taipei",
   tags: ["Cafe", "Vegan"],
   last: "about 1 month ago",
+  get lastLabel() { return t("recordsTable.about1MonthAgo"); },
   strength: "weak",
   website: "red-lantern.example.com"
 }, {
@@ -455,6 +506,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Salt & Silk — Muscat",
   tags: ["Imports", "Catering", "Gelato"],
   last: "8 months ago",
+  get lastLabel() { return t("recordsTable.label8MonthsAgo"); },
   strength: "veryweak",
   website: "salt-and-silk.example.com"
 }, {
@@ -462,6 +514,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Tropic Churn — San Juan",
   tags: ["Sorbet", "Local", "B2C"],
   last: "6 days ago",
+  get lastLabel() { return t("recordsTable.label6DaysAgo"); },
   strength: "strong",
   website: "tropic-churn.example.com"
 }, {
@@ -469,6 +522,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Umber Cream — Warsaw",
   tags: ["B2B", "Wholesale", "Cafe"],
   last: "5 weeks ago",
+  get lastLabel() { return t("recordsTable.label5WeeksAgo"); },
   strength: "weak",
   website: "umber-cream.example.com"
 }, {
@@ -476,12 +530,14 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Vanilla Vale — Antananarivo",
   tags: ["Imports", "Local"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }, {
   id: "willow-whip",
   name: "Willow Whip — Portland",
   tags: ["Dairy-free", "Vegan", "Cafe"],
   last: "3 days ago",
+  get lastLabel() { return t("recordsTable.label3DaysAgo"); },
   strength: "strong",
   website: "willow-whip.example.com"
 }, {
@@ -489,6 +545,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Zenith Gelato — Auckland",
   tags: ["Gelato", "Seasonal"],
   last: "3 weeks ago",
+  get lastLabel() { return t("recordsTable.label3WeeksAgo"); },
   strength: "weak",
   website: "zenith-gelato.example.com"
 }, {
@@ -496,6 +553,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Apricot Atlas — Algiers",
   tags: ["Sorbet", "Imports"],
   last: "11 months ago",
+  get lastLabel() { return t("recordsTable.label11MonthsAgo"); },
   strength: "veryweak",
   website: "apricot-atlas.example.com"
 }, {
@@ -503,6 +561,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Black Sesame Social — Bandung",
   tags: ["Vegan", "Cafe", "B2C"],
   last: "9 days ago",
+  get lastLabel() { return t("recordsTable.label9DaysAgo"); },
   strength: "strong",
   website: "black-sesame.example.com"
 }, {
@@ -510,6 +569,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Crimson Clover — Brussels",
   tags: ["Gelato", "Wholesale", "Catering"],
   last: "2 months ago",
+  get lastLabel() { return t("recordsTable.label2MonthsAgo"); },
   strength: "weak",
   website: "crimson-clover.example.com"
 }, {
@@ -517,6 +577,7 @@ const INITIAL_ROWS: RecordRow[] = [{
   name: "Dragonfruit Dock — Shenzhen",
   tags: ["Sorbet", "B2B", "Wholesale"],
   last: "No contact",
+  get lastLabel() { return t("recordsTable.noContact"); },
   strength: "none"
 }];
 
@@ -565,6 +626,7 @@ type Prompt = {
 };
 type ToolKind = "model" | "web" | "user";
 type ColumnMeta = {
+  label: string;
   type: string;
   tool: string;
   toolKind: ToolKind;
@@ -573,59 +635,97 @@ type ColumnMeta = {
 };
 const COLUMN_META: Record<string, ColumnMeta> = {
   Company: {
+    get label() { return t("recordsTable.company"); },
     type: "Text",
-    tool: "User input",
+    get tool() { return t("recordsTable.userInput"); },
     toolKind: "user"
   },
   Categories: {
+    get label() { return t("recordsTable.categories"); },
     type: "Multi select",
     tool: "Sprinkles 5",
     toolKind: "model",
     inputs: "Company",
     prompt: {
-      before: "Tag each ",
-      chip: "Company",
-      after: " with its market categories."
+      get before() { return t("recordsTable.tagEach") + " "; },
+      get chip() { return t("recordsTable.company"); },
+      get after() { return " " + t("recordsTable.withItsMarketCategories"); }
     }
   },
   "Last interaction": {
+    get label() { return t("recordsTable.lastInteraction"); },
     type: "Date",
-    tool: "User input",
+    get tool() { return t("recordsTable.userInput"); },
     toolKind: "user"
   },
   "Connection strength": {
+    get label() { return t("recordsTable.connectionStrength"); },
     type: "Single select",
     tool: "Sprinkles 5",
     toolKind: "model",
     inputs: "Last interaction",
     prompt: {
-      before: "Score the relationship from ",
-      chip: "Last interaction",
+      get before() { return t("recordsTable.scoreTheRelationshipFrom") + " "; },
+      get chip() { return t("recordsTable.lastInteraction"); },
       after: "."
     }
   },
   Links: {
+    get label() { return t("recordsTable.links"); },
     type: "URL",
-    tool: "Web search",
+    get tool() { return t("common.webSearch"); },
     toolKind: "web",
     inputs: "Company",
     prompt: {
-      before: "Find the website for ",
-      chip: "Company",
+      get before() { return t("recordsTable.findTheWebsiteFor") + " "; },
+      get chip() { return t("recordsTable.company"); },
       after: "."
     }
   },
   [AI_LABEL]: {
+    get label() { return t("recordsTable.competitors"); },
     type: "Text",
-    tool: "Web search",
+    get tool() { return t("common.webSearch"); },
     toolKind: "web",
     inputs: "Company",
     prompt: {
-      before: "Find competitors for ",
-      chip: "Company"
+      get before() { return t("recordsTable.findCompetitorsFor") + " "; },
+      get chip() { return t("recordsTable.company"); }
     }
   }
 };
+function columnLabel(id: string) { return COLUMN_META[id]?.label ?? id; }
+const PROPERTY_LABEL_KEYS = {
+  "Text": "recordsTable.text",
+  "File": "recordsTable.file",
+  "Collection": "recordsTable.collection",
+  "Single select": "recordsTable.singleSelect",
+  "Multi select": "recordsTable.multiSelect",
+  "URL": "recordsTable.url",
+  "Reference": "recordsTable.reference",
+  "File splitter": "recordsTable.fileSplitter",
+  "Date": "common.date"
+} as const;
+function propertyTypeLabel(id: string) { return Object.hasOwn(PROPERTY_LABEL_KEYS, id) ? t(PROPERTY_LABEL_KEYS[id as keyof typeof PROPERTY_LABEL_KEYS]) : id; }
+const TAG_LABEL_KEYS = {
+  "Cafe": "recordsTable.cafe",
+  "Catering": "recordsTable.catering",
+  "Dairy-free": "common.dairyFree",
+  "Gelato": "common.gelato",
+  "Imports": "recordsTable.imports",
+  "Local": "recordsTable.local",
+  "Seasonal": "common.seasonal",
+  "Sorbet": "recordsTable.sorbet",
+  "Vegan": "recordsTable.vegan",
+  "Wholesale": "common.wholesale"
+} as const;
+function tagLabel(id: string) { return Object.hasOwn(TAG_LABEL_KEYS, id) ? t(TAG_LABEL_KEYS[id as keyof typeof TAG_LABEL_KEYS]) : id; }
+// After the first edit, contenteditable owns its DOM; locale changes only update its accessible label.
+const PromptEditor = createComponent<{ prompt?: Prompt; label: string }>("PromptEditor", ["prompt", "label"], (__props) => {
+  let editedContent: UI.VNodeChild;
+  const content = () => __props.prompt ? <span class="text-ink">{__props.prompt.before}{__props.prompt.chip && <span contenteditable={false} class="rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{columnLabel(__props.prompt.chip)}</span>}{__props.prompt.after}</span> : <span class="text-ink-3">{t("recordsTable.setAPromptPressToMentionAnInput")}</span>;
+  return () => <div contenteditable role="textbox" aria-label={__props.label} aria-multiline="true" spellcheck onInput={() => { editedContent ??= content(); }} class="mt-2 min-h-[88px] cursor-text rounded-[10px] bg-inset p-3 text-[13px] leading-relaxed shadow-hairline outline-none transition-[box-shadow] duration-150 focus:shadow-[0_0_0_2px_var(--accent)]">{editedContent ?? content()}</div>;
+});
 const NEW_PROPERTY_TYPES = ["Text", "File", "Collection", "Single select", "Multi select", "URL", "Reference", "JSON", "File splitter"];
 const MODEL_OPTIONS = ["Sprinkles 5", "Sprinkles 4.2", "Sprinkles Mini"];
 const INPUT_OPTIONS = ["Company", "Categories", "Last interaction", "Connection strength", "Links"];
@@ -650,7 +750,8 @@ const Checkbox = createComponent<{
 });
 const Tag = createComponent<{
   name: string;
-}>("Tag", ["name"], (__props, __slots) => {
+  localize?: boolean;
+}>("Tag", ["name", "localize"], (__props, __slots) => {
   const name = computed(() => __props.name);
   const color = computed(() => TAG_COLORS[name.value] ?? {
     base: "var(--ink-3)"
@@ -659,13 +760,14 @@ const Tag = createComponent<{
     return <span class="records-tag" style={cssStyle({
       "--tag-base": color.value.base
     } as UI.CSSProperties)}>
-      {name.value}
+      {__props.localize ? tagLabel(name.value) : name.value}
     </span>;
   };
 });
 const TagList = createComponent<{
   tags: string[];
-}>("TagList", ["tags"], (__props, __slots) => {
+  localize?: boolean;
+}>("TagList", ["tags", "localize"], (__props, __slots) => {
   const tags = computed(() => __props.tags);
   const containerRef = templateRef<HTMLDivElement>(null);
   const measureRef = templateRef<HTMLDivElement>(null);
@@ -694,23 +796,23 @@ const TagList = createComponent<{
     const observer = new ResizeObserver(update);
     observer.observe(container);
     return () => observer.disconnect();
-  }, () => [tags.value]);
+  }, () => [tags.value, locale.value]);
   const hiddenCount = computed(() => tags.value.length - visibleCount.value);
   return () => {
-    return <div ref={containerRef} class="records-tags" title={tags.value.join(", ")} aria-label={`Categories: ${tags.value.join(", ")}`}>
+    return <div ref={containerRef} class="records-tags" title={tags.value.map(tag => __props.localize ? tagLabel(tag) : tag).join(", ")} aria-label={t("recordsTable.categories0", [tags.value.map(tag => __props.localize ? tagLabel(tag) : tag).join(", ")])}>
       <div ref={measureRef} class="records-tags-measure" aria-hidden>
-        {tags.value.map(tag => <span key={tag} data-tag-measure><Tag name={tag} /></span>)}
-        <span data-more-measure class="records-more-tag">+{tags.value.length}</span>
+        {tags.value.map(tag => <span key={tag} data-tag-measure><Tag name={tag} localize={__props.localize} /></span>)}
+        <span data-more-measure class="records-more-tag">{"+"}{tags.value.length}</span>
       </div>
-      {tags.value.slice(0, visibleCount.value).map(tag => <Tag key={tag} name={tag} />)}
-      {hiddenCount.value > 0 && <span class="records-more-tag">+{hiddenCount.value}</span>}
+      {tags.value.slice(0, visibleCount.value).map(tag => <Tag key={tag} name={tag} localize={__props.localize} />)}
+      {hiddenCount.value > 0 && <span class="records-more-tag">{"+"}{hiddenCount.value}</span>}
     </div>;
   };
 });
 const CalcCell = createComponent<Record<string, never>>("CalcCell", [], (__props, __slots) => {
   return () => {
     return <span class="records-calc">
-      <span class="records-muted">Calculating…</span>
+      <span class="records-muted">{t("recordsTable.calculating")}</span>
       <span class="records-pulse" />
     </span>;
   };
@@ -765,7 +867,7 @@ const HeaderCell = createComponent<{
       <button type="button" class="records-header-button" onClick={onPick.value}>
         <span class="records-header-icon">{icon.value}</span>
         <span class="truncate">{label.value}</span>
-        {sortKey.value && <span role="button" tabindex={0} aria-label={`Sort by ${label.value}`} onClick={event => {
+        {sortKey.value && <span role="button" tabindex={0} aria-label={t("recordsTable.sortBy0", [label.value])} onClick={event => {
           event.stopPropagation();
           onSort.value(sortKey.value!);
         }} onKeydown={event => {
@@ -780,7 +882,7 @@ const HeaderCell = createComponent<{
             <Icon size={12}><path d="M12 5v14M5 12l7 7 7-7" /></Icon>
           </span>}
       </button>
-      <span role="separator" aria-orientation="vertical" aria-label={`Resize ${label.value} column`} class={`records-resize-handle ${resizing.value ? "is-resizing" : ""}`} onPointerdown={onResizeStart.value} />
+      <span role="separator" aria-orientation="vertical" aria-label={t("recordsTable.resize0Column", [label.value])} class={`records-resize-handle ${resizing.value ? "is-resizing" : ""}`} onPointerdown={onResizeStart.value} />
     </th>;
   };
 });
@@ -801,6 +903,7 @@ const ConfigRow = createComponent<{
 const ConfigPicker = createComponent<{
   label: string;
   options: {
+    value: string;
     label: string;
     icon: UI.VNodeChild;
   }[];
@@ -818,10 +921,10 @@ const ConfigPicker = createComponent<{
     })}>
       <div class="px-2 pb-1 pt-0.5 text-[11.5px] font-medium text-ink-3">{label.value}</div>
       <GlideMenu className="flex flex-col gap-px">
-        {options.value.map(option => <button key={option.label} data-menu-row type="button" role="menuitemradio" aria-checked={selected.value === option.label} onClick={() => onSelect.value(option.label)} class="relative z-10 flex h-8 w-full items-center gap-1.5 rounded-[8px] px-1.5 text-left text-[13px] font-medium text-ink">
+        {options.value.map(option => <button key={option.value} data-menu-row type="button" role="menuitemradio" aria-checked={selected.value === option.value} onClick={() => onSelect.value(option.value)} class="relative z-10 flex h-8 w-full items-center gap-1.5 rounded-[8px] px-1.5 text-left text-[13px] font-medium text-ink">
             <span class="flex size-4 shrink-0 items-center justify-center text-ink-2">{option.icon}</span>
             <span class="min-w-0 flex-1 truncate">{option.label}</span>
-            <span class={selected.value === option.label ? "text-ink" : "invisible"}>
+            <span class={selected.value === option.value ? "text-ink" : "invisible"}>
               <Icon size={14} strokeWidth={2.2}><path d="m5 12 4 4L19 6" /></Icon>
             </span>
           </button>)}
@@ -838,11 +941,11 @@ const InputPicker = createComponent<{
   const selected = computed(() => __props.selected);
   const onToggle = computed(() => __props.onToggle);
   return () => {
-    return <div role="menu" aria-label="Calculation inputs" class="absolute left-full top-0 z-30 ml-5 w-[220px] rounded-[12px] bg-surface p-1.5 shadow-overlay" style={cssStyle({
+    return <div role="menu" aria-label={t("recordsTable.calculationInputs")} class="absolute left-full top-0 z-30 ml-5 w-[220px] rounded-[12px] bg-surface p-1.5 shadow-overlay" style={cssStyle({
       animation: "pop-in 140ms cubic-bezier(0.23,1,0.32,1) both",
       transformOrigin: "top left"
     })}>
-      <div class="px-2 pb-1 pt-0.5 text-[11.5px] font-medium text-ink-3">Use values from</div>
+      <div class="px-2 pb-1 pt-0.5 text-[11.5px] font-medium text-ink-3">{t("recordsTable.useValuesFrom")}</div>
       <GlideMenu className="flex flex-col gap-px">
         {options.value.map(option => {
           const checked = selected.value.includes(option);
@@ -850,7 +953,7 @@ const InputPicker = createComponent<{
               <span class={`flex size-4 shrink-0 items-center justify-center rounded-[5px] border ${checked ? "border-accent bg-accent text-white" : "border-line-strong text-transparent"}`}>
                 <Icon size={11} strokeWidth={2.4}><path d="m5 12 4 4L19 6" /></Icon>
               </span>
-              <span class="min-w-0 flex-1 truncate">{option}</span>
+              <span class="min-w-0 flex-1 truncate">{columnLabel(option)}</span>
             </button>;
         })}
       </GlideMenu>
@@ -941,7 +1044,7 @@ const RecordsTable = createComponent<{
   }, () => [columnWidthsLocked.value]);
   const visibleRows = computed(() => {
     return [...rows.value].sort((a, b) => {
-      const value = sort.value.key === "name" ? a.name.localeCompare(b.name) : sort.value.key === "last" ? a.last.localeCompare(b.last) : STRENGTH[a.strength].rank - STRENGTH[b.strength].rank;
+      const value = sort.value.key === "name" ? a.name.localeCompare(b.name, locale.value) : sort.value.key === "last" ? a.last.localeCompare(b.last, locale.value) : STRENGTH[a.strength].rank - STRENGTH[b.strength].rank;
       return value * sort.value.dir;
     });
   });
@@ -1076,7 +1179,7 @@ const RecordsTable = createComponent<{
   const tableWidth = computed(() => columnWidths.value.company + columnWidths.value.categories + columnWidths.value.last + columnWidths.value.strength + columnWidths.value.links + (aiAdded.value ? columnWidths.value.ai : 0) + actionColumnWidth.value);
   return () => {
     return <div class={`records-shell${fill.value ? " is-fill" : ""}`}>
-      <div class="records-scroll" tabindex={0} aria-label="Companies table. Scroll horizontally and vertically to view all columns and records." onScroll={() => {
+      <div class="records-scroll" tabindex={0} aria-label={t("recordsTable.companiesTableScrollHorizontallyAndVerticallyToViewAll")} onScroll={() => {
         if (ignoreScrollRef.value) {
           ignoreScrollRef.value = false;
           return;
@@ -1121,25 +1224,25 @@ const RecordsTable = createComponent<{
                 <div class="records-company-header" style={cssStyle({
                   cursor: "pointer"
                 })} onClick={event => openProp("Company")(event)}>
-                  <Checkbox checked={allSelected.value} mixed={partiallySelected.value} onChange={toggleAll} label="Select all companies" />
-                  <span>Company</span>
+                  <Checkbox checked={allSelected.value} mixed={partiallySelected.value} onChange={toggleAll} label={t("recordsTable.selectAllCompanies")} />
+                  <span>{t("recordsTable.company")}</span>
                 </div>
-                <span role="separator" aria-orientation="vertical" aria-label="Resize Company column" class={`records-resize-handle ${resizingColumn.value === "company" ? "is-resizing" : ""}`} onPointerdown={startColumnResize("company", 180)} />
+                <span role="separator" aria-orientation="vertical" aria-label={t("recordsTable.resizeCompanyColumn")} class={`records-resize-handle ${resizingColumn.value === "company" ? "is-resizing" : ""}`} onPointerdown={startColumnResize("company", 180)} />
               </th>
-              <HeaderCell label="Categories" selected={prop.value!?.col === "Categories"} onPick={openProp("Categories")} sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("categories")} resizing={resizingColumn.value === "categories"} icon={<Icon size={15}>{TYPE_GLYPHS["Multi select"]}</Icon>} />
-              <HeaderCell label="Last interaction" selected={prop.value!?.col === "Last interaction"} onPick={openProp("Last interaction")} sortKey="last" sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("last")} resizing={resizingColumn.value === "last"} icon={<Icon size={15}>{TYPE_GLYPHS.Date}</Icon>} />
-              <HeaderCell label="Connection strength" selected={prop.value!?.col === "Connection strength"} onPick={openProp("Connection strength")} sortKey="strength" sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("strength")} resizing={resizingColumn.value === "strength"} icon={<Icon size={15}>{TYPE_GLYPHS["Single select"]}</Icon>} />
-              <HeaderCell label="Links" selected={prop.value!?.col === "Links"} onPick={openProp("Links")} sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("links")} resizing={resizingColumn.value === "links"} icon={<Icon size={15}>{TYPE_GLYPHS.URL}</Icon>} />
+              <HeaderCell label={t("recordsTable.categories")} selected={prop.value!?.col === "Categories"} onPick={openProp("Categories")} sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("categories")} resizing={resizingColumn.value === "categories"} icon={<Icon size={15}>{TYPE_GLYPHS["Multi select"]}</Icon>} />
+              <HeaderCell label={t("recordsTable.lastInteraction")} selected={prop.value!?.col === "Last interaction"} onPick={openProp("Last interaction")} sortKey="last" sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("last")} resizing={resizingColumn.value === "last"} icon={<Icon size={15}>{TYPE_GLYPHS.Date}</Icon>} />
+              <HeaderCell label={t("recordsTable.connectionStrength")} selected={prop.value!?.col === "Connection strength"} onPick={openProp("Connection strength")} sortKey="strength" sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("strength")} resizing={resizingColumn.value === "strength"} icon={<Icon size={15}>{TYPE_GLYPHS["Single select"]}</Icon>} />
+              <HeaderCell label={t("recordsTable.links")} selected={prop.value!?.col === "Links"} onPick={openProp("Links")} sort={sort.value} onSort={toggleSort} onResizeStart={startColumnResize("links")} resizing={resizingColumn.value === "links"} icon={<Icon size={15}>{TYPE_GLYPHS.URL}</Icon>} />
               {aiAdded.value && <th ref={aiThRef} class={`records-header-cell ${prop.value!?.col === AI_LABEL ? "is-colsel" : ""}`}>
                   <button type="button" class="records-header-button" onClick={openProp(AI_LABEL)}>
                     <span class="records-header-icon"><Icon size={15}>{TYPE_GLYPHS.Text}</Icon></span>
-                    <span class="truncate">{AI_LABEL}</span>
+                    <span class="truncate">{columnLabel(AI_LABEL)}</span>
                   </button>
-                  <span role="separator" aria-orientation="vertical" aria-label={`Resize ${AI_LABEL} column`} class={`records-resize-handle ${resizingColumn.value === "ai" ? "is-resizing" : ""}`} onPointerdown={startColumnResize("ai")} />
+                  <span role="separator" aria-orientation="vertical" aria-label={t("recordsTable.resize0Column", [columnLabel(AI_LABEL)])} class={`records-resize-handle ${resizingColumn.value === "ai" ? "is-resizing" : ""}`} onPointerdown={startColumnResize("ai")} />
                 </th>}
               <th class="records-header-cell">
                 <div class="flex h-[35px] items-center gap-1 px-2">
-                  <button type="button" aria-label="New property" data-recpop onClick={event => {
+                  <button type="button" aria-label={t("recordsTable.newProperty")} data-recpop onClick={event => {
                     setProp(null);
                     setTableMenuOpen(null);
                     const rect = (event.currentTarget as HTMLElement as Element).getBoundingClientRect();
@@ -1150,7 +1253,7 @@ const RecordsTable = createComponent<{
                   }} class="flex size-7 items-center justify-center rounded-[7px] text-ink-2 transition-colors duration-100 hover:bg-hover hover:text-ink">
                     <Icon size={15} strokeWidth={2}><path d="M12 5v14M5 12h14" /></Icon>
                   </button>
-                  <button type="button" aria-label="Table options" aria-expanded={!!tableMenuOpen.value} data-recpop onClick={event => {
+                  <button type="button" aria-label={t("recordsTable.tableOptions")} aria-expanded={!!tableMenuOpen.value} data-recpop onClick={event => {
                     setProp(null);
                     setAddOpen(null);
                     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -1171,15 +1274,15 @@ const RecordsTable = createComponent<{
               const selectedRow = selected.value.has(row.id);
               const strength = STRENGTH[row.strength];
               return <tr key={row.id} class={`records-row ${selectedRow ? "is-selected" : ""}`}>
-                <td class={`records-cell records-sticky-cell records-company-cell ${prop.value!?.col === "Company" ? "is-colsel" : ""}`}><span class="records-rownum">{index + 1}</span><Checkbox checked={selectedRow} onChange={() => toggleRow(row.id)} label={`Select ${row.name}`} /><span class="records-company-mark">{row.name.slice(0, 1).toUpperCase()}</span><a href={row.website ? `https://${row.website}` : "#"} onClick={event => !row.website && event.preventDefault()} title={row.name} class={`records-company-name ${row.website ? "has-link" : ""}`}>{row.name}</a></td>
-                <td class={`records-cell ${prop.value!?.col === "Categories" ? "is-colsel" : ""}`}>{isCalc("Categories", index) ? <CalcCell /> : <TagList tags={row.tags} />}</td>
-                <td class={`records-cell ${row.last === "No contact" ? "records-muted" : ""} ${prop.value!?.col === "Last interaction" ? "is-colsel" : ""}`}>{isCalc("Last interaction", index) ? <CalcCell /> : row.last}</td>
+                <td class={`records-cell records-sticky-cell records-company-cell ${prop.value!?.col === "Company" ? "is-colsel" : ""}`}><span class="records-rownum">{index + 1}</span><Checkbox checked={selectedRow} onChange={() => toggleRow(row.id)} label={t("recordsTable.select0", [row.name])} /><span class="records-company-mark">{row.name.slice(0, 1).toUpperCase()}</span><a href={row.website ? `https://${row.website}` : "#"} onClick={event => !row.website && event.preventDefault()} title={row.name} class={`records-company-name ${row.website ? "has-link" : ""}`}>{row.name}</a></td>
+                <td class={`records-cell ${prop.value!?.col === "Categories" ? "is-colsel" : ""}`}>{isCalc("Categories", index) ? <CalcCell /> : <TagList tags={row.tags} localize={__props.rows === undefined} />}</td>
+                <td class={`records-cell ${row.last === "No contact" ? "records-muted" : ""} ${prop.value!?.col === "Last interaction" ? "is-colsel" : ""}`}>{isCalc("Last interaction", index) ? <CalcCell /> : (__props.rows === undefined ? INITIAL_ROWS.find(item => item.id === row.id)?.lastLabel ?? row.last : row.last)}</td>
                 <td class={`records-cell ${prop.value!?.col === "Connection strength" ? "is-colsel" : ""}`}>{isCalc("Connection strength", index) ? <CalcCell /> : <span class="records-strength"><span class="records-strength-dot" style={cssStyle({
                       background: strength.color
                     })} />{strength.label}</span>}</td>
-                <td class={`records-cell ${prop.value!?.col === "Links" ? "is-colsel" : ""}`}>{isCalc("Links", index) ? <CalcCell /> : row.website ? <a class="records-link" href={`https://${row.website}`} title={row.website} target="_blank" rel="noreferrer"><span class="records-link-label">{row.website}</span><Icon size={12}><path d="M14 5h5v5M19 5l-8 8" /></Icon></a> : <span class="records-muted">—</span>}</td>
+                <td class={`records-cell ${prop.value!?.col === "Links" ? "is-colsel" : ""}`}>{isCalc("Links", index) ? <CalcCell /> : row.website ? <a class="records-link" href={`https://${row.website}`} title={row.website} target="_blank" rel="noreferrer"><span class="records-link-label">{row.website}</span><Icon size={12}><path d="M14 5h5v5M19 5l-8 8" /></Icon></a> : <span class="records-muted">{"—"}</span>}</td>
                 {aiAdded.value && <td class={`records-cell ${prop.value!?.col === AI_LABEL ? "is-colsel" : ""}`}>
-                    {calc.value?.col === AI_LABEL ? index < calc.value.resolved ? competitorsFor(index) : <CalcCell /> : aiDone.value ? competitorsFor(index) : <span class="records-muted">—</span>}
+                    {calc.value?.col === AI_LABEL ? index < calc.value.resolved ? competitorsFor(index) : <CalcCell /> : aiDone.value ? competitorsFor(index) : <span class="records-muted">{"—"}</span>}
                   </td>}
                 <td class="records-cell" />
               </tr>;
@@ -1188,19 +1291,19 @@ const RecordsTable = createComponent<{
           <tfoot>
             <tr class="records-calculation-row">
               <td class="records-cell records-sticky-cell">
-                <span class="records-footer-value records-calculation-label"><span class="records-calculation-number">{rows.value.length}</span> count</span>
+                <span class="records-footer-value records-calculation-label"><span class="records-calculation-number">{rows.value.length}</span>{(" " + t("common.count"))}</span>
               </td>
               <td class="records-cell">
-                <button type="button" class="records-add-calculation"><Icon size={15}><path d="M12 5v14M5 12h14" /></Icon>Add calculation</button>
+                <button type="button" class="records-add-calculation"><Icon size={15}><path d="M12 5v14M5 12h14" /></Icon>{t("recordsTable.addCalculation")}</button>
               </td>
-              <td class="records-cell records-muted"><span class="records-footer-value">—</span></td>
+              <td class="records-cell records-muted"><span class="records-footer-value">{"—"}</span></td>
               <td class="records-cell">
                 <span class="records-footer-value records-average"><span class="records-strength-dot" style={cssStyle({
                     background: "var(--orange)"
-                  })} />{Math.round(rows.value.reduce((sum, row) => sum + STRENGTH[row.strength].rank, 0) / rows.value.length / 3 * 100)}% average</span>
+                  })} />{Math.round(rows.value.reduce((sum, row) => sum + STRENGTH[row.strength].rank, 0) / rows.value.length / 3 * 100)}{t("recordsTable.average")}</span>
               </td>
-              <td class="records-cell"><span class="records-footer-value records-muted">{rows.value.filter(row => row.website).length} links</span></td>
-              {aiAdded.value && <td class="records-cell records-muted"><span class="records-footer-value">{aiDone.value ? `${rows.value.length} filled` : "—"}</span></td>}
+              <td class="records-cell"><span class="records-footer-value records-muted">{rows.value.filter(row => row.website).length}{(" " + t("recordsTable.links2"))}</span></td>
+              {aiAdded.value && <td class="records-cell records-muted"><span class="records-footer-value">{aiDone.value ? t("recordsTable.label0Filled", [rows.value.length]) : "—"}</span></td>}
               <td class="records-cell" />
             </tr>
           </tfoot>
@@ -1214,16 +1317,17 @@ const RecordsTable = createComponent<{
         animation: "pop-in 160ms cubic-bezier(0.23,1,0.32,1) both",
         transformOrigin: "top left"
       })}>
-          <div class="pb-2 text-[13.5px] font-medium text-ink">{prop.value!.col}</div>
+          <div class="pb-2 text-[13.5px] font-medium text-ink">{columnLabel(prop.value!.col)}</div>
 
-          <ConfigRow label="Type">
+          <ConfigRow label={t("common.type")}>
             <button type="button" aria-haspopup="menu" aria-expanded={configMenu.value === "type"} onClick={() => setConfigMenu(current => current === "type" ? null : "type")} class="flex items-center gap-1.5 rounded-[6px] px-1.5 py-1 text-[13px] font-medium text-ink transition-colors duration-100 hover:bg-hover">
               <span class="text-ink-2"><Icon size={14}>{TYPE_GLYPHS[meta.value!.type] ?? TYPE_GLYPHS.Text}</Icon></span>
-              {meta.value!.type}
+              {propertyTypeLabel(meta.value!.type)}
               <span class="text-ink-3"><Icon size={12} strokeWidth={2.2}><path d="M9 6l6 6-6 6" /></Icon></span>
             </button>
-            {configMenu.value === "type" && <ConfigPicker label="Property type" selected={meta.value!.type} options={NEW_PROPERTY_TYPES.map(type => ({
-            label: type,
+            {configMenu.value === "type" && <ConfigPicker label={t("recordsTable.propertyType")} selected={meta.value!.type} options={NEW_PROPERTY_TYPES.map(type => ({
+            value: type,
+            label: propertyTypeLabel(type),
             icon: <Icon size={15}>{TYPE_GLYPHS[type]}</Icon>
           }))} onSelect={type => {
             setColumnOverrides(current => ({
@@ -1236,7 +1340,7 @@ const RecordsTable = createComponent<{
             setConfigMenu(null);
           }} />}
           </ConfigRow>
-          <ConfigRow label="Tool">
+          <ConfigRow label={t("recordsTable.tool")}>
             <button type="button" aria-haspopup="menu" aria-expanded={configMenu.value === "tool"} onClick={() => setConfigMenu(current => current === "tool" ? null : "tool")} class="flex items-center gap-1.5 rounded-[6px] px-1.5 py-1 text-[13px] font-medium text-ink transition-colors duration-100 hover:bg-hover">
               <span class={meta.value!.toolKind === "model" ? "text-accent" : "text-ink-2"}>
                 {meta.value!.toolKind === "model" ? <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>{TOOL_GLYPHS.model}</svg> : <Icon size={14}>{TOOL_GLYPHS[meta.value!.toolKind]}</Icon>}
@@ -1244,7 +1348,8 @@ const RecordsTable = createComponent<{
               {meta.value!.tool}
               <span class="text-ink-3"><Icon size={12} strokeWidth={2.2}><path d="M9 6l6 6-6 6" /></Icon></span>
             </button>
-            {configMenu.value === "tool" && <ConfigPicker label="Model" selected={meta.value!.tool} options={MODEL_OPTIONS.map(model => ({
+            {configMenu.value === "tool" && <ConfigPicker label={t("common.model")} selected={meta.value!.tool} options={MODEL_OPTIONS.map(model => ({
+            value: model,
             label: model,
             icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>{TOOL_GLYPHS.model}</svg>
           }))} onSelect={tool => {
@@ -1259,10 +1364,10 @@ const RecordsTable = createComponent<{
             setConfigMenu(null);
           }} />}
           </ConfigRow>
-          <ConfigRow label="Grounding">
+          <ConfigRow label={t("common.grounding")}>
             <span class="flex items-center gap-2">
-              <MiniSwitch label="Grounding" on={grounding.value} onToggle={() => setGrounding(current => !current)} />
-              <button type="button" aria-label="About grounding" aria-expanded={groundingHelpOpen.value} onClick={() => setGroundingHelpOpen(open => !open)} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
+              <MiniSwitch label={t("common.grounding")} on={grounding.value} onToggle={() => setGrounding(current => !current)} />
+              <button type="button" aria-label={t("recordsTable.aboutGrounding")} aria-expanded={groundingHelpOpen.value} onClick={() => setGroundingHelpOpen(open => !open)} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
                 <Icon size={13}><g><circle cx="12" cy="12" r="9" /><path d="M12 8h.01M11 12h1v4h1" /></g></Icon>
               </button>
             </span>
@@ -1270,15 +1375,14 @@ const RecordsTable = createComponent<{
             color: "var(--tooltip-fg)",
             background: "var(--tooltip-bg)"
           })} role="status">
-                Grounding lets the model verify generated values against connected sources.
-              </div>}
+                {t("recordsTable.groundingLetsTheModelVerifyGeneratedValuesAgainstConnected")}</div>}
           </ConfigRow>
-          <ConfigRow label="Inputs">
+          <ConfigRow label={t("recordsTable.inputs")}>
             <button type="button" aria-haspopup="menu" aria-expanded={configMenu.value === "inputs"} onClick={() => setConfigMenu(current => current === "inputs" ? null : "inputs")} class="flex max-w-[220px] items-center gap-1.5 rounded-[6px] px-1.5 py-1 text-[13px] text-ink-2 transition-colors duration-100 hover:bg-hover hover:text-ink">
               {selectedInputs.value.length ? <span class="flex min-w-0 items-center gap-1">
-                  {selectedInputs.value.slice(0, 2).map(input => <span key={input} class="max-w-[92px] truncate rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{input}</span>)}
-                  {selectedInputs.value.length > 2 && <span class="text-[11px] font-medium text-ink-3">+{selectedInputs.value.length - 2}</span>}
-                </span> : <span>Select inputs</span>}
+                  {selectedInputs.value.slice(0, 2).map(input => <span key={input} class="max-w-[92px] truncate rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{columnLabel(input)}</span>)}
+                  {selectedInputs.value.length > 2 && <span class="text-[11px] font-medium text-ink-3">{"+"}{selectedInputs.value.length - 2}</span>}
+                </span> : <span>{t("recordsTable.selectInputs")}</span>}
               <span class="shrink-0 text-ink-3"><Icon size={12} strokeWidth={2.2}><path d="M9 6l6 6-6 6" /></Icon></span>
             </button>
             {configMenu.value === "inputs" && <InputPicker selected={selectedInputs.value} options={INPUT_OPTIONS.filter(input => input !== prop.value!.col)} onToggle={input => {
@@ -1294,13 +1398,7 @@ const RecordsTable = createComponent<{
           </ConfigRow>
 
           {/* prompt — @-mention chips inline */}
-          <div contenteditable role="textbox" aria-label={`${prop.value!.col} calculation prompt`} aria-multiline="true" spellcheck class="mt-2 min-h-[88px] cursor-text rounded-[10px] bg-inset p-3 text-[13px] leading-relaxed shadow-hairline outline-none transition-[box-shadow] duration-150 focus:shadow-[0_0_0_2px_var(--accent)]">
-            {meta.value!.prompt ? <span class="text-ink">
-                {meta.value!.prompt.before}
-                {meta.value!.prompt.chip && <span contenteditable={false} class="rounded-[5px] bg-accent-tint px-1.5 py-0.5 text-[12px] font-medium text-accent-ink">{meta.value!.prompt.chip}</span>}
-                {meta.value!.prompt.after}
-              </span> : <span class="text-ink-3">Set a prompt (press @ to mention an input)</span>}
-          </div>
+          <PromptEditor key={prop.value!.col} prompt={meta.value!.prompt} label={t("recordsTable.label0CalculationPrompt", [columnLabel(prop.value!.col)])} />
 
           <button type="button" disabled={!!calc.value} onClick={() => {
           setCalc({
@@ -1310,8 +1408,7 @@ const RecordsTable = createComponent<{
           setProp(null);
         }} class="mt-2.5 flex h-9 w-full items-center justify-center gap-2 rounded-[9px] text-[12.5px] font-medium text-ink shadow-btn transition-[background-color,transform] duration-150 hover:bg-hover active:scale-[0.98] disabled:opacity-60">
             <Icon size={14} strokeWidth={1.9}><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" /></Icon>
-            Go calculate
-          </button>
+            {t("recordsTable.goCalculate")}</button>
 
           <GlideMenu className="mt-3 flex flex-col gap-0.5 border-t border-line pt-2" highlightClassName="-inset-x-1.5 rounded-[8px] bg-hover">
             <button data-menu-row type="button" aria-pressed={pinnedColumns.value.has(prop.value!.col)} onClick={() => setPinnedColumns(current => {
@@ -1320,11 +1417,11 @@ const RecordsTable = createComponent<{
             return next;
           })} class="relative z-10 -mx-1.5 flex h-8 items-center gap-2.5 rounded-[8px] px-1.5 text-left text-[13px] leading-none text-ink transition-transform duration-150 active:scale-[0.96]">
               <span class={pinnedColumns.value.has(prop.value!.col) ? "text-accent" : "text-ink-2"}><Icon size={15}><path d="M12 17v5M8 3h8l-1 7 3 3H6l3-3-1-7z" /></Icon></span>
-              {pinnedColumns.value.has(prop.value!.col) ? "Unpin" : "Pin"}
+              {pinnedColumns.value.has(prop.value!.col) ? t("recordsTable.unpin") : t("recordsTable.pin")}
             </button>
             <button data-menu-row type="button" aria-expanded={moreSettingsOpen.value} onClick={() => setMoreSettingsOpen(open => !open)} class="relative z-10 -mx-1.5 flex h-8 items-center gap-2.5 rounded-[8px] px-1.5 text-left text-[13px] leading-none text-ink transition-transform duration-150 active:scale-[0.96]">
               <span class={moreSettingsOpen.value ? "text-ink" : "text-ink-2"}><Icon size={15}><g><circle cx="12" cy="12" r="3" /><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1" /></g></Icon></span>
-              <span class="flex-1">More settings</span>
+              <span class="flex-1">{t("recordsTable.moreSettings")}</span>
               <span class={`text-ink-3 transition-transform duration-150 ${moreSettingsOpen.value ? "rotate-90" : ""}`}><Icon size={12} strokeWidth={2.2}><path d="M9 6l6 6-6 6" /></Icon></span>
             </button>
             {prop.value!.col === AI_LABEL && <button data-menu-row type="button" onClick={() => {
@@ -1333,28 +1430,27 @@ const RecordsTable = createComponent<{
             setProp(null);
           }} class="relative z-10 -mx-1.5 flex h-8 items-center gap-2.5 rounded-[8px] px-1.5 text-left text-[13px] leading-none text-ink transition-transform duration-150 active:scale-[0.96]">
                 <span class="text-ink-2"><Icon size={15}><g><path d="M10.6 5.1A9.8 9.8 0 0 1 12 5c7 0 10 7 10 7a16.3 16.3 0 0 1-2.1 3M6.6 6.6A16 16 0 0 0 2 12s3 7 10 7a9.7 9.7 0 0 0 5.4-1.6M3 3l18 18" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></g></Icon></span>
-                Hide from view
-              </button>}
+                {t("recordsTable.hideFromView")}</button>}
           </GlideMenu>
 
           {moreSettingsOpen.value && <div class="mt-2 border-t border-line pt-2" style={cssStyle({
           animation: "fade-up 160ms cubic-bezier(0.23,1,0.32,1) both"
         })}>
-              <div class="pb-1 text-[11.5px] font-medium text-ink-3">Behavior</div>
-              <ConfigRow label="Required value">
-                <MiniSwitch label="Required value" on={advancedSettings.value.required} onToggle={() => setAdvancedSettings(current => ({
+              <div class="pb-1 text-[11.5px] font-medium text-ink-3">{t("recordsTable.behavior")}</div>
+              <ConfigRow label={t("recordsTable.requiredValue")}>
+                <MiniSwitch label={t("recordsTable.requiredValue")} on={advancedSettings.value.required} onToggle={() => setAdvancedSettings(current => ({
               ...current,
               required: !current.required
             }))} />
               </ConfigRow>
-              <ConfigRow label="Allow empty results">
-                <MiniSwitch label="Allow empty results" on={advancedSettings.value.allowEmpty} onToggle={() => setAdvancedSettings(current => ({
+              <ConfigRow label={t("recordsTable.allowEmptyResults")}>
+                <MiniSwitch label={t("recordsTable.allowEmptyResults")} on={advancedSettings.value.allowEmpty} onToggle={() => setAdvancedSettings(current => ({
               ...current,
               allowEmpty: !current.allowEmpty
             }))} />
               </ConfigRow>
-              <ConfigRow label="Show confidence">
-                <MiniSwitch label="Show confidence" on={advancedSettings.value.confidence} onToggle={() => setAdvancedSettings(current => ({
+              <ConfigRow label={t("recordsTable.showConfidence")}>
+                <MiniSwitch label={t("recordsTable.showConfidence")} on={advancedSettings.value.confidence} onToggle={() => setAdvancedSettings(current => ({
               ...current,
               confidence: !current.confidence
             }))} />
@@ -1369,7 +1465,7 @@ const RecordsTable = createComponent<{
         animation: "pop-in 160ms cubic-bezier(0.23,1,0.32,1) both",
         transformOrigin: "top left"
       })}>
-          <div class="px-2 pb-1 pt-1 text-[12px] font-medium text-ink-3">New property</div>
+          <div class="px-2 pb-1 pt-1 text-[12px] font-medium text-ink-3">{t("recordsTable.newProperty")}</div>
           <GlideMenu className="flex flex-col gap-px">
             {NEW_PROPERTY_TYPES.map(type => <button key={type} data-menu-row type="button" onClick={() => {
             setAddOpen(null);
@@ -1390,7 +1486,7 @@ const RecordsTable = createComponent<{
         animation: "pop-in 160ms cubic-bezier(0.23,1,0.32,1) both",
         transformOrigin: "top right"
       })}>
-          <div class="px-2 pb-1 pt-1 text-[12px] font-medium text-ink-3">Table options</div>
+          <div class="px-2 pb-1 pt-1 text-[12px] font-medium text-ink-3">{t("recordsTable.tableOptions")}</div>
           <GlideMenu className="flex flex-col gap-px">
           <button data-menu-row type="button" onClick={() => {
             const position = tableMenuOpen.value!;
@@ -1401,8 +1497,7 @@ const RecordsTable = createComponent<{
             });
           }} class="relative z-10 flex h-9 w-full items-center gap-2.5 rounded-[8px] px-2 text-left text-[13px] text-ink">
             <span class="text-ink-2"><Icon size={15} strokeWidth={2}><path d="M12 5v14M5 12h14" /></Icon></span>
-            Add property
-          </button>
+            {t("recordsTable.addProperty")}</button>
           <button data-menu-row type="button" onClick={() => {
             setColumnWidths({
               company: 220,
@@ -1415,8 +1510,7 @@ const RecordsTable = createComponent<{
             setTableMenuOpen(null);
           }} class="relative z-10 flex h-9 w-full items-center gap-2.5 rounded-[8px] px-2 text-left text-[13px] text-ink">
             <span class="text-ink-2"><Icon size={15}><path d="M4 8h16M7 4 3 8l4 4M17 4l4 4-4 4M4 16h16" /></Icon></span>
-            Compact columns
-          </button>
+            {t("recordsTable.compactColumns")}</button>
           <button data-menu-row type="button" onClick={() => {
             setColumnWidths({
               ...(initialColumnWidthsRef.value ?? DEFAULT_COLUMN_WIDTHS)
@@ -1424,16 +1518,14 @@ const RecordsTable = createComponent<{
             setTableMenuOpen(null);
           }} class="relative z-10 flex h-9 w-full items-center gap-2.5 rounded-[8px] px-2 text-left text-[13px] text-ink">
             <span class="text-ink-2"><Icon size={15}><path d="M3 12a9 9 0 1 0 3-6.7M3 4v6h6" /></Icon></span>
-            Reset column widths
-          </button>
+            {t("recordsTable.resetColumnWidths")}</button>
           <div class="my-1 h-px bg-line" />
           <button data-menu-row type="button" onClick={() => {
             setSelected(new Set());
             setTableMenuOpen(null);
           }} class="relative z-10 flex h-9 w-full items-center gap-2.5 rounded-[8px] px-2 text-left text-[13px] text-ink">
             <span class="text-ink-2"><Icon size={15}><path d="M5 5l14 14M19 5 5 19" /></Icon></span>
-            Clear selection
-          </button>
+            {t("recordsTable.clearSelection")}</button>
           </GlideMenu>
         </div>}
     </div>;

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -30,22 +31,25 @@ export type DiffRow = {
   email: string;
   removed: boolean;
 };
-const ROWS: DiffRow[] = [{
+const ROWS: (DiffRow & { displayId: string; displayDept: string })[] = [{
   key: "rocky",
   id: "Rocky Road",
-  dept: "Classic",
+  get displayId() { return t("common.rockyRoad"); },
+  dept: "Classic", get displayDept() { return t("common.classic"); },
   email: "aurora-scoops",
   removed: true
 }, {
   key: "bubblegum",
   id: "Bubblegum",
-  dept: "Retro",
+  get displayId() { return t("common.bubblegum"); },
+  dept: "Retro", get displayDept() { return t("common.retro"); },
   email: "kumo-creamery",
   removed: true
 }, {
   key: "mint",
   id: "Mint Chip",
-  dept: "Classic",
+  get displayId() { return t("common.mintChip"); },
+  dept: "Classic", get displayDept() { return t("common.classic"); },
   email: "maple-orbit",
   removed: false
 }];
@@ -94,8 +98,8 @@ const DiffTable = createComponent<{
     return <div class="w-full max-w-95">
       <div class="relative overflow-hidden rounded-card bg-surface shadow-card">
         <div class="primitive-card-bar flex items-center justify-between border-b border-line">
-          <span class="text-[12.5px] font-medium text-ink">Proposed menu cleanup</span>
-          {settled.value && !accepted.value && <span class="text-[11px] text-ink-3">Click changed rows to toggle</span>}
+          <span class="text-[12.5px] font-medium text-ink">{t("diffTable.proposedMenuCleanup")}</span>
+          {settled.value && !accepted.value && <span class="text-[11px] text-ink-3">{t("diffTable.clickChangedRowsToToggle")}</span>}
         </div>
 
         <table class="w-full table-fixed border-collapse text-left">
@@ -106,7 +110,7 @@ const DiffTable = createComponent<{
           </colgroup>
           <thead>
             <tr class="border-b border-line">
-              {["Flavor", "Category", "Supplier"].map(h => <th key={h} class="primitive-table-cell text-[12px] font-medium text-ink-3">
+              {[t("diffTable.flavor"), t("diffTable.category"), t("diffTable.supplier")].map(h => <th key={h} class="primitive-table-cell text-[12px] font-medium text-ink-3">
                   {h}
                 </th>)}
             </tr>
@@ -126,14 +130,14 @@ const DiffTable = createComponent<{
                   <td class="primitive-table-cell text-[13px] font-medium tabular-nums transition-colors duration-200" style={cssStyle({
                   color: out ? "var(--red)" : "var(--ink)"
                 })}>
-                    {row.id}
+                    {__props.rows === undefined ? ROWS.find(item => item.id === row.id)?.displayId ?? row.id : row.id}
                   </td>
                   <td class="primitive-table-cell">
                     <span class="inline-flex h-5.5 items-center gap-1.5 rounded-full bg-inset px-2 text-[11.5px] font-medium shadow-hairline transition-opacity duration-200" style={cssStyle({
                     opacity: out ? 0.55 : 1
                   })}>
                       <span class={`size-1.5 rounded-full ${DOT[row.dept]}`} />
-                      <span class="text-ink-2">{row.dept}</span>
+                      <span class="text-ink-2">{__props.rows === undefined ? ROWS.find(item => item.id === row.id)?.displayDept ?? row.dept : row.dept}</span>
                     </span>
                   </td>
                   <td class="primitive-table-cell text-[12.5px] whitespace-nowrap transition-colors duration-200" style={cssStyle({
@@ -157,7 +161,7 @@ const DiffTable = createComponent<{
                   transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)"
                 })}>
                   <div class="overflow-hidden">
-                    <div role="checkbox" tabindex={accepted.value ? -1 : 0} aria-checked={edits.value.pistachio} aria-label="Include adding Pistachio" onClick={accepted.value ? undefined : () => toggleEdit("pistachio")} onKeydown={accepted.value ? undefined : event => {
+                    <div role="checkbox" tabindex={accepted.value ? -1 : 0} aria-checked={edits.value.pistachio} aria-label={t("diffTable.includeAddingPistachio")} onClick={accepted.value ? undefined : () => toggleEdit("pistachio")} onKeydown={accepted.value ? undefined : event => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         toggleEdit("pistachio");
@@ -168,19 +172,18 @@ const DiffTable = createComponent<{
                       <span class="primitive-table-cell text-[13px] font-medium tabular-nums transition-colors duration-200" style={cssStyle({
                         color: edits.value.pistachio ? "var(--green)" : "var(--ink-3)"
                       })}>
-                        Pistachio
-                      </span>
+                        {t("common.pistachio")}</span>
                       <span class="primitive-table-cell">
                         <span class="inline-flex h-5.5 items-center gap-1.5 rounded-full bg-surface px-2 text-[11.5px] font-medium shadow-hairline">
                           <span class="size-1.5 rounded-full bg-green" />
-                          <span class="text-ink-2">Seasonal</span>
+                          <span class="text-ink-2">{t("common.seasonal")}</span>
                         </span>
                       </span>
                       <span class="primitive-table-cell text-[13px] transition-colors duration-200" style={cssStyle({
                         color: edits.value.pistachio ? "var(--green)" : "var(--ink-3)"
                       })}>
                         <span class="flex items-center justify-between gap-2">
-                          <span class="min-w-0 truncate">maple-orbit</span>
+                          <span class="min-w-0 truncate">{"maple-orbit"}</span>
                           <IncludedMark included={edits.value.pistachio} tone="green" />
                         </span>
                       </span>
@@ -202,16 +205,15 @@ const DiffTable = createComponent<{
                 <span class="flex size-4.5 items-center justify-center rounded-full bg-green text-white">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
                 </span>
-                {removals.value + additions.value} {removals.value + additions.value === 1 ? "edit" : "edits"} applied
-              </span> : <>
+                {removals.value + additions.value} {removals.value + additions.value === 1 ? t("common.edit") : t("common.edits")}{(" " + t("diffTable.applied"))}</span> : <>
                 <span class="text-[11.5px] tabular-nums text-ink-3">
-                  {removals.value} {removals.value === 1 ? "removal" : "removals"} · {additions.value} {additions.value === 1 ? "addition" : "additions"}
+                  {removals.value} {removals.value === 1 ? t("diffTable.removal") : t("diffTable.removals")} {" · "}{additions.value} {additions.value === 1 ? t("diffTable.addition") : t("diffTable.additions")}
                 </span>
                 <span class="flex items-center gap-1.5">
                   <Button variant="accent" size="sm" disabled={removals.value + additions.value === 0} onClick={() => {
                 setAccepted(true);
               }} className="text-[12px]">
-                    Apply {removals.value + additions.value} {removals.value + additions.value === 1 ? "change" : "changes"}
+                    {(t("diffTable.apply") + " ")}{removals.value + additions.value} {removals.value + additions.value === 1 ? t("common.change") : t("diffTable.changes")}
                   </Button>
                 </span>
               </>}

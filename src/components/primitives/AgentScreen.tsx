@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -95,7 +96,7 @@ const Screen = createComponent<{
     return <div class="absolute inset-0 overflow-hidden bg-inset">
       {streamSrc.value ? /\.(mp4|webm|mov|m4v)(\?|$)/i.test(streamSrc.value) ? <video src={streamSrc.value} autoplay muted loop playsinline class="absolute inset-0 h-full w-full object-cover" /> :
       
-      <img src={streamSrc.value} alt="" class="absolute inset-0 h-full w-full object-cover" /> : <FauxWindow />}
+      <img src={streamSrc.value} alt={""} class="absolute inset-0 h-full w-full object-cover" /> : <FauxWindow />}
       {cursor.value && <DriftCursor />}
     </div>;
   };
@@ -114,7 +115,7 @@ const MediaSizer = createComponent<{
   return () => {
     return /\.(mp4|webm|mov|m4v)(\?|$)/i.test(src.value) ? <video src={src.value} autoplay muted loop playsinline class={cls.value} style={cssStyle(style.value)} /> :
     
-    <img src={src.value} alt="" class={cls.value} style={cssStyle(style.value)} />;
+    <img src={src.value} alt={""} class={cls.value} style={cssStyle(style.value)} />;
   };
 });
 /* connecting state — spinner on black, same ring as Task Rows */
@@ -138,8 +139,7 @@ const LoadingScreen = createComponent<Record<string, never>>("LoadingScreen", []
       <span class="absolute inset-x-0 text-center text-[12.5px] font-medium text-white/70" style={cssStyle({
         top: "calc(50% + 28px)"
       })}>
-        Connecting to agent&apos;s screen
-      </span>
+        {t("agentScreen.connectingToAgentSScreen")}</span>
     </div>;
   };
 });
@@ -161,12 +161,11 @@ const FauxWindow = createComponent<Record<string, never>>("FauxWindow", [], (__p
         <Ico size={12} path={<path d="M15 18l-6-6 6-6" />} />
         <Ico size={12} path={<path d="M9 6l6 6-6 6" />} />
         <span class="min-w-0 flex-1 truncate rounded-full bg-field px-2.5 py-[3px] font-mono text-[9px] text-ink-3">
-          hunter.io/try/search/ugly.cash
-        </span>
+          {"hunter.io/try/search/ugly.cash"}</span>
       </div>
       <div class="flex flex-1 flex-col gap-2.5 overflow-hidden p-3">
         <div class="flex items-center gap-2">
-          <span class="grid size-4 place-items-center rounded-[4px] bg-accent-tint text-[8px] font-bold text-accent">h</span>
+          <span class="grid size-4 place-items-center rounded-[4px] bg-accent-tint text-[8px] font-bold text-accent">{"h"}</span>
           <span class="h-1.5 w-12 rounded-full bg-line-strong" />
           <span class="ml-auto h-4 w-12 rounded-full bg-inset shadow-btn" />
         </div>
@@ -190,7 +189,7 @@ const AgentScreen = createComponent<{
   streamSrc?: string;
   variant?: string;
 }>("AgentScreen", ["agentName", "streamSrc", "variant"], (__props, __slots) => {
-  const agentName = computed(() => __props.agentName === undefined ? "Agent" : __props.agentName);
+  const agentName = computed(() => __props.agentName === undefined ? t("common.agent") : __props.agentName);
   const streamSrc = computed(() => __props.streamSrc === undefined ? PLACEHOLDER : __props.streamSrc);
   const variant = computed(() => __props.variant);
   const loading = computed(() => variant.value === "Loading");
@@ -233,12 +232,10 @@ const AgentScreen = createComponent<{
   const controls = computed(() => <div class="flex shrink-0 items-center gap-1.5">
       {recording.value ? <button type="button" onClick={endRecording} class="inline-flex h-[27px] items-center gap-1.5 rounded-full bg-red pl-2.5 pr-3 text-[13px] font-medium leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] transition-[transform,filter] duration-150 ease-out hover:brightness-95 active:scale-[0.96]">
           <span class="size-2.5 rounded-[2px] bg-white" />
-          End
-        </button> : <Button variant="secondary" size="sm" className="gap-1 pl-1.5" onClick={startRecording}>
+          {t("agentScreen.end")}</button> : <Button variant="secondary" size="sm" className="gap-1 pl-1.5" onClick={startRecording}>
           <Ico size={15} path={<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" fill="currentColor" stroke="none" /></>} />
-          Teach a task
-        </Button>}
-      <button type="button" aria-label="Collapse" onClick={() => setOpen(false)} class="primitive-icon-button text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
+          {t("agentScreen.teachATask")}</Button>}
+      <button type="button" aria-label={t("agentScreen.collapse")} onClick={() => setOpen(false)} class="primitive-icon-button text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
         <Ico size={15} path={collapseIcon} />
       </button>
     </div>);
@@ -259,17 +256,16 @@ const AgentScreen = createComponent<{
                 setOpen(true);
               }}>
                   <Ico size={14} path={openIcon} />
-                  Open
-                </Button>
+                  {t("agentScreen.open")}</Button>
               </span>
             </div>
           </>}
       </div>
 
-      <div class="mt-2.5 truncate px-0.5 text-[13px] font-medium text-ink">{agentName.value}&apos;s screen</div>
+      <div class="mt-2.5 truncate px-0.5 text-[13px] font-medium text-ink">{agentName.value}{t("agentScreen.sScreen")}</div>
 
       {/* ── expanded viewer — portaled to <body> so it takes over the whole page ── */}
-      {open.value && mounted.value && teleport(<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true" aria-label={`${agentName.value}'s screen`}>
+      {open.value && mounted.value && teleport(<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" role="dialog" aria-modal="true" aria-label={t("agentScreen.label0SScreen", [agentName.value])}>
             <div class="absolute inset-0 bg-black/60 dark:bg-black/75" style={cssStyle({
           animation: "fade-in 180ms ease-out both"
         })} onClick={() => setOpen(false)} />

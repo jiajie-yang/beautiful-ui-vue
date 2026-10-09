@@ -2,8 +2,14 @@ import { readFile, writeFile, mkdir, readdir, access, stat } from 'node:fs/promi
 import { resolve, dirname, relative } from 'node:path';
 import ts from 'typescript';
 const root = resolve(import.meta.dirname, '..');
+const packageManifest = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
 const metaSource = await readFile(resolve(root,'src/lib/meta.ts'),'utf8');
-const { META } = await import(`data:text/javascript;base64,${Buffer.from(ts.transpileModule(metaSource,{compilerOptions:{module:ts.ModuleKind.ESNext}}).outputText).toString('base64')}`);
+const moduleUrl = source => `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
+const compile = source => ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const { en } = await import(moduleUrl(compile(await readFile(resolve(root, 'src/lib/locales/en.ts'), 'utf8'))));
+// Registry metadata always uses English, independently of a browser's saved language.
+const registryComposer = moduleUrl(`import { createI18n } from ${JSON.stringify(import.meta.resolve('vue-i18n'))}; export const t = createI18n({ legacy: false, locale: 'en', messages: { en: ${JSON.stringify(en)} } }).global.t;`);
+const { META } = await import(moduleUrl(compile(metaSource.replace("'./i18n'", JSON.stringify(registryComposer)))));
 const output = resolve(root,'public/r'); await mkdir(output,{recursive:true});
 const exists = async p => { try { await access(p); return true; } catch { return false; } };
 async function locate(spec, file) {
@@ -37,7 +43,7 @@ export async function collect(entry) {
     const folder=dirname(file);
     for(const license of ['LICENSE','glimm-LICENSE','audio-LICENSE','glimm-NOTICE.md','audio-NOTICE.md']) if(await exists(resolve(folder,license)))await visit(resolve(folder,license));
   }
-  return { files:[...files].map(([path,content])=>({ path:relative(root,path)+(path.endsWith('LICENSE')?'.md':''), target:'~/'+relative(root,path)+(path.endsWith('LICENSE')?'.md':''), type:path.endsWith('.css')?'registry:style':path.includes('/components/')?'registry:component':'registry:lib', content })), dependencies:[...dependencies].sort() };
+  return { files:[...files].map(([path,content])=>({ path:relative(root,path)+(path.endsWith('LICENSE')?'.md':''), target:'~/'+relative(root,path)+(path.endsWith('LICENSE')?'.md':''), type:path.endsWith('.css')?'registry:style':path.includes('/components/')?'registry:component':'registry:lib', content })), dependencies:[...dependencies].map(name => name === 'vue-i18n' ? `${name}@${packageManifest.dependencies[name]}` : name).sort() };
 }
 const entries=[...META.map(e=>({...e,path:`src/components/primitives/${e.file}`}))];
 for(const file of await readdir(resolve(root,'src/components/atoms')))if(file.endsWith('.tsx')) entries.push({id:file.slice(0,-4).replace(/[A-Z]/g,(s,i)=>(i?'-':'')+s.toLowerCase()),title:file.slice(0,-4),path:`src/components/atoms/${file}`});

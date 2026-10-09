@@ -4,7 +4,7 @@
 
 [Beautiful UI Vue](https://github.com/jiajie-yang/beautiful-ui-vue) 是基于 [Beautiful UI](https://github.com/slev12397/beautiful-ui) 迁移并改写的独立项目，采用 Vue 3 + Vite + TypeScript + Tailwind CSS 4 技术栈，保留原版的组件、交互与视觉设计。组件使用原生 Vue JSX，站点外壳采用 Vue SFC；不使用 React 兼容层。拥有自己的 Git 仓库、依赖、锁文件与构建配置，可独立移动和部署。
 
-本 README 提供中文与英文版本。演示界面仍以英文为主，尚未提供语言切换。
+本 README 与界面均支持英文和简体中文。首页和 `/harness` 顶部提供 EN / 中文切换；首次访问根据浏览器语言选择，之后记住用户选择。切换时保留当前聊天、输入草稿和组件交互状态。品牌名、代码、文件路径、用户输入与许可证原文保持原样。
 
 ## 预览
 
@@ -82,6 +82,8 @@ pnpm dlx shadcn-vue@latest add http://127.0.0.1:4173/r/agent-screen.json
 
 注册表在 `public/r/`，共 33 项（21 个画廊组件、11 个基础控件、GlideMenu）。每项包含完整本地依赖及基础 CSS；AgentScreen 的演示图片嵌入安装源码，避免安装后图片缺失。许可证在注册表中用块注释包裹全文，兼容安装器的源码解析，原仓库许可证保留原文。仅重新生成注册表而不构建应用时，可运行 `pnpm build:registry`。
 
+国际化采用 Vue I18n 11 的 Composition API，使用稳定文案键、独立中英文资源和英文回退。注册表包含共享的 `src/lib/i18n.ts`、`src/lib/locales`，并声明 `vue-i18n` 依赖。使用组件的应用可以从 `@/lib/i18n` 导入 `setLocale`，调用 `setLocale('zh-CN')` 或 `setLocale('en')` 统一切换显示文案；组件 ID 和变体值保持稳定，外部标签、业务数据及代码原样显示；默认示例的展示文案通过稳定键翻译。新增文案和语言的流程见[国际化维护说明](docs/I18N.zh-CN.md)。
+
 注册表不会安装字体包，需要在使用组件的项目中执行：
 
 ```sh
@@ -117,3 +119,5 @@ RESEND_API_KEY 仅在服务端读取，不能使用 `VITE_` 前缀。需要能�
 详见 [迁移验证报告](docs/MIGRATION_VALIDATION.zh-CN.md)。商业 Central Icons 改为本地 SVG，保持尺寸和语义，少数字形与原版不同；React Agentation 改为 Vue 开发工具，提供选元素、填写反馈和复制功能，不包含 Agentation 的外部服务集成。Inter / JetBrains Mono 改为本地 Fontsource 加载，字体文件版本与 Google 在线构建可能存在细微光栅差异。
 
 本项目拥有独立版本历史，不是原项目的 submodule，也没有指向原版的运行时导入或符号链接。保留原作者 MIT 版权声明及第三方许可。来源和版本见 [UPSTREAM.zh-CN.md](UPSTREAM.zh-CN.md)。
+
+简体中文功能的测试范围与验证记录见 [中文界面验证说明](docs/LOCALIZATION_VALIDATION.zh-CN.md)。

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -39,19 +40,19 @@ const NODES: StepNode[] = [{
   x: 0.5,
   w: 300,
   kind: {
-    label: "Trigger",
+    get label() { return t("flowchart.trigger"); },
     hue: PURPLE
   },
   hue: PURPLE,
-  title: "New order created",
-  caption: "Trigger when a new order is created"
+  get title() { return t("flowchart.newOrderCreated"); },
+  get caption() { return t("flowchart.triggerWhenANewOrderIsCreated"); }
 }, {
   id: "cond",
   row: 1,
   x: 0.5,
   w: 356,
   kind: {
-    label: "If / Else",
+    get label() { return t("flowchart.ifElse"); },
     hue: AMBER
   },
   condition: true
@@ -66,28 +67,28 @@ const EST_H: Record<string, number> = {
   trigger: 92,
   cond: 134
 };
-const PROPERTIES = ["flavor", "topping", "size", "scoops"];
+const PROPERTIES = [{ name: "flavor", get label() { return t("common.flavor"); } }, { name: "topping", get label() { return t("flowchart.topping"); } }, { name: "size", get label() { return t("flowchart.size"); } }, { name: "scoops", get label() { return t("flowchart.scoops"); } }];
 const FLAVORS = [{
-  name: "Rocky Road",
-  tag: "Classic"
+  name: "Rocky Road", get label() { return t("common.rockyRoad"); },
+  get tag() { return t("common.classic"); }
 }, {
-  name: "Mint Chip",
-  tag: "Classic"
+  name: "Mint Chip", get label() { return t("common.mintChip"); },
+  get tag() { return t("common.classic"); }
 }, {
-  name: "Pistachio",
-  tag: "Seasonal"
+  name: "Pistachio", get label() { return t("common.pistachio"); },
+  get tag() { return t("common.seasonal"); }
 }, {
-  name: "Bubblegum",
-  tag: "Retro"
+  name: "Bubblegum", get label() { return t("common.bubblegum"); },
+  get tag() { return t("common.retro"); }
 }];
 const TOPPINGS = [{
-  name: "Brown butter bourbon brittle crunch"
+  name: "Brown butter bourbon brittle crunch", get label() { return t("flowchart.brownButterBourbonBrittleCrunch"); }
 }, {
-  name: "Rainbow sprinkles"
+  name: "Rainbow sprinkles", get label() { return t("flowchart.rainbowSprinkles"); }
 }, {
-  name: "Hot fudge"
+  name: "Hot fudge", get label() { return t("flowchart.hotFudge"); }
 }, {
-  name: "Candied pecans"
+  name: "Candied pecans", get label() { return t("flowchart.candiedPecans"); }
 }];
 
 /* ── icons ── */
@@ -128,6 +129,7 @@ const CheckIcon = createComponent<Record<string, never>>("CheckIcon", [], (__pro
 const Menu = createComponent<{
   items: {
     name: string;
+    label?: string;
     tag?: string;
   }[];
   value: string;
@@ -169,7 +171,7 @@ const Menu = createComponent<{
       {items.value.map((item, i) => <button key={item.name} type="button" ref={(el: any) => {
         rowRefs.value[i] = el;
       }} onMouseenter={() => setHovered(i)} onClick={() => onPick.value(item.name)} class="relative z-10 flex h-7.5 w-full cursor-pointer items-center gap-2 rounded-[6px] px-2 text-left">
-          <span class="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{item.name}</span>
+          <span class="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink">{item.label ?? item.name}</span>
           {item.tag && <span class="shrink-0 text-[11px] text-ink-3">{item.tag}</span>}
           <span class={`shrink-0 text-ink ${item.name === value.value ? "" : "invisible"}`}>
             <CheckIcon />
@@ -185,8 +187,7 @@ const SourceChip = createComponent<Record<string, never>>("SourceChip", [], (__p
       <span class="text-ink-2">
         <ConeIcon size={12} />
       </span>
-      order
-    </span>;
+      {t("common.order")}</span>;
   };
 });
 const SelectChip = createComponent<{
@@ -195,6 +196,7 @@ const SelectChip = createComponent<{
   dot?: boolean;
   items: {
     name: string;
+    label?: string;
     tag?: string;
   }[];
   width: string;
@@ -220,7 +222,7 @@ const SelectChip = createComponent<{
         {dot.value && <span class="size-1.5 shrink-0 rounded-full" style={cssStyle({
           background: AMBER
         })} />}
-        <span class="min-w-0 truncate">{value.value}</span>
+        <span class="min-w-0 truncate">{items.value.find(item => item.name === value.value)?.label ?? value.value}</span>
         <Chevron />
       </button>
       {open.value && <Menu items={items.value} value={value.value} width={width.value} align={align.value} onPick={name => onPick.value(id.value, name)} />}
@@ -255,18 +257,17 @@ const ConditionBody = createComponent<Record<string, never>>("ConditionBody", []
   };
   const chip = (id: string, items: {
     name: string;
+    label?: string;
     tag?: string;
   }[], width: string, extra?: object) => <SelectChip id={id} value={values.value[id]} items={items} width={width} open={open.value === id} onToggle={toggle} onPick={pick} {...extra} />;
   return () => {
     return <div class="flex flex-col gap-1.5 px-3 py-2.5">
       <div class="flex min-w-0 items-center gap-1.5">
         <Handle />
-        <span class="w-7 text-[12.5px] text-ink-2">If</span>
+        <span class="w-7 text-[12.5px] text-ink-2">{t("flowchart.if")}</span>
         <SourceChip />
-        {chip("prop1", PROPERTIES.map(name => ({
-          name
-        })), "w-36")}
-        <span class="text-[12.5px] text-ink-2">is</span>
+        {chip("prop1", PROPERTIES, "w-36")}
+        <span class="text-[12.5px] text-ink-2">{t("flowchart.is")}</span>
         {chip("val1", FLAVORS, "w-44", {
           dot: true,
           align: "right"
@@ -274,12 +275,10 @@ const ConditionBody = createComponent<Record<string, never>>("ConditionBody", []
       </div>
       <div class="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1.5">
         <Handle />
-        <span class="w-7 text-[12.5px] text-ink-2">and</span>
+        <span class="w-7 text-[12.5px] text-ink-2">{t("flowchart.and")}</span>
         <SourceChip />
-        {chip("prop2", PROPERTIES.map(name => ({
-          name
-        })), "w-36")}
-        <span class="text-[12.5px] text-ink-2">is</span>
+        {chip("prop2", PROPERTIES, "w-36")}
+        <span class="text-[12.5px] text-ink-2">{t("flowchart.is")}</span>
         <span class="max-w-full pl-[49px]">
           {chip("val2", TOPPINGS, "w-64", {
             dot: true

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -166,8 +167,8 @@ const FileIcon = createComponent<Record<string, never>>("FileIcon", [], (__props
   };
 });
 const DEFAULT_LABELS: CodeBlockLabels = {
-  copy: "Copy",
-  copied: "Copied"
+  get copy() { return t("common.copy"); },
+  get copied() { return t("common.copied"); }
 };
 export type CodeBlockProps = {
   /** Which view to render — "Code" (line-numbered listing) or "Diff". */
@@ -219,9 +220,9 @@ const CodeBlock = createComponent<CodeBlockProps>("CodeBlock", ["variant", "line
         </span>
 
         {isDiff.value ? <span class="ml-auto inline-flex items-center gap-2 font-mono text-[12px] leading-none tabular-nums">
-            <span class="text-green">+{added.value}</span>
-            <span class="text-red">-{removed.value}</span>
-          </span> : <button type="button" aria-label="Copy code" onClick={copy} class={`-mr-1 ml-auto flex h-6 items-center gap-1 rounded-[6px] px-1.5 text-[12px]
+            <span class="text-green">{"+"}{added.value}</span>
+            <span class="text-red">{"-"}{removed.value}</span>
+          </span> : <button type="button" aria-label={t("common.copyCode")} onClick={copy} class={`-mr-1 ml-auto flex h-6 items-center gap-1 rounded-[6px] px-1.5 text-[12px]
               font-medium transition-colors duration-100 hover:bg-hover
               ${copied.value ? "text-green" : "text-ink-3 hover:text-ink"}`}>
             {copied.value ? <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg> : <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>}

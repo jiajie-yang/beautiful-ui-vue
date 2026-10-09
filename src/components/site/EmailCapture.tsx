@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -47,12 +48,9 @@ const EmailForm = createComponent<Record<string, never>>("EmailForm", [], (__pro
   return () => {
     return <>
       <h2 class="max-w-md text-[19px] leading-snug font-semibold tracking-[-0.02em] text-ink text-balance">
-        New components, in your inbox.
-      </h2>
+        {t("emailCapture.newComponentsInYourInbox")}</h2>
       <p class="mt-2 max-w-md text-[13px] leading-relaxed text-ink-2 text-pretty">
-        Get new primitives and updates as they ship — copy-paste ready. No spam,
-        unsubscribe anytime.
-      </p>
+        {t("emailCapture.getNewPrimitivesAndUpdatesAsTheyShipCopy")}</p>
 
       {status.value === "done" ? <div class="mt-5 flex items-center gap-2 text-[13px] font-medium text-ink" style={cssStyle({
         animation: "fade-up 350ms cubic-bezier(0.23,1,0.32,1) both"
@@ -62,8 +60,7 @@ const EmailForm = createComponent<Record<string, never>>("EmailForm", [], (__pro
               <path d="M20 6L9 17l-5-5" />
             </svg>
           </span>
-          You’re on the list — talk soon.
-        </div> : <form onSubmit={submit} class="mt-5 flex max-w-md flex-col gap-1.5" novalidate>
+          {t("emailCapture.youReOnTheListTalkSoon")}</div> : <form onSubmit={submit} class="mt-5 flex max-w-md flex-col gap-1.5" novalidate>
           <div class="flex items-center gap-2">
             <div class="flex h-9 flex-1 items-center rounded-control bg-inset px-3 transition-shadow duration-150" style={cssStyle({
             boxShadow: status.value === "error" ? "0 0 0 1px var(--red)" : "var(--shadow-hairline)"
@@ -75,7 +72,7 @@ const EmailForm = createComponent<Record<string, never>>("EmailForm", [], (__pro
               <input type="email" inputmode="email" autocomplete="email" value={email.value} onInput={e => {
               setEmail((e.target as HTMLInputElement).value);
               if (status.value === "error") setStatus("idle");
-            }} placeholder="you@studio.com" aria-label="Email address" class="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3" />
+            }} placeholder={"you@studio.com"} aria-label={t("emailCapture.emailAddress")} class="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3" />
             </div>
             <button type="submit" disabled={!valid.value || status.value === "loading"} class="flex h-9 shrink-0 items-center gap-1.5 rounded-control bg-ink px-3.5 text-[12.5px]
                 font-medium text-canvas shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_1px_2px_rgba(16,24,40,0.1)]
@@ -84,10 +81,8 @@ const EmailForm = createComponent<Record<string, never>>("EmailForm", [], (__pro
                   <span class="size-3.5 rounded-full border-[1.5px] border-canvas/40 border-t-canvas" style={cssStyle({
                 animation: "spin 700ms linear infinite"
               })} />
-                  Joining
-                </> : <>
-                  Notify me
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  {t("emailCapture.joining")}</> : <>
+                  {t("emailCapture.notifyMe")}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14M13 6l6 6-6 6" />
                   </svg>
                 </>}
@@ -96,8 +91,7 @@ const EmailForm = createComponent<Record<string, never>>("EmailForm", [], (__pro
           {status.value === "error" && <p class="text-[12px] text-red" style={cssStyle({
           animation: "fade-in 150ms ease-out both"
         })}>
-              Something went wrong — try again.
-            </p>}
+              {t("emailCapture.somethingWentWrongTryAgain")}</p>}
         </form>}
     </>;
   };
@@ -130,14 +124,14 @@ export const EmailModal = createComponent<{
   }, () => [open.value, onClose.value]);
   return () => {
     if (!open.value) return null;
-    return <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label="Get new components in your inbox">
+    return <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label={t("emailCapture.getNewComponentsInYourInbox")}>
       <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-black/55" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })} onClick={onClose.value} />
       <div class="relative w-full max-w-[460px] overflow-hidden rounded-window bg-surface shadow-overlay" style={cssStyle({
         animation: "pop-in 250ms cubic-bezier(0.23,1,0.32,1) both"
       })}>
-        <button type="button" aria-label="Close" onClick={onClose.value} class="absolute top-3.5 right-3.5 z-10 flex size-8 items-center justify-center rounded-control text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-ink">
+        <button type="button" aria-label={t("common.close")} onClick={onClose.value} class="absolute top-3.5 right-3.5 z-10 flex size-8 items-center justify-center rounded-control text-ink-3 transition-colors duration-150 hover:bg-hover hover:text-ink">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M18 6L6 18M6 6l12 12" /></svg>
         </button>
         <div class="px-6 pt-6 pb-7">

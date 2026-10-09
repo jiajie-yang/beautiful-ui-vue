@@ -1,9 +1,10 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
 import { createComponent, createState, templateRef, watchLifecycle, cssStyle, omitProps, teleport } from '@/lib/vue-tools';
 import { REGISTRY, type Entry } from "@/lib/registry";
-import { INTERNAL } from "@/lib/meta";
+import { INTERNAL, VARIANT_KEYS } from "@/lib/meta";
 
 /* ─────────────────────────────────────────────────────────
  * GRID + CODE OVERLAY
@@ -103,17 +104,17 @@ const Card = createComponent<{
         {entry.value.variants && <div class="absolute bottom-2.5 left-1/2 flex -translate-x-1/2 rounded-full bg-field p-0.5">
             {entry.value.variants.map(v => <button key={v} onClick={() => setVariant(v)} class={`rounded-full px-2 py-0.5 text-[11.5px] font-medium transition-[background-color,color,box-shadow] duration-150
                   ${variant.value === v ? "bg-surface text-ink shadow-btn" : "text-ink-3 hover:text-ink-2"}`}>
-                {v}
+                {t(VARIANT_KEYS[v as keyof typeof VARIANT_KEYS])}
               </button>)}
           </div>}
         <div class="absolute top-3 right-3 flex gap-1 opacity-0 transition-opacity
             duration-150 group-hover:opacity-100 group-focus-within:opacity-100">
-          <button aria-label="Copy code" onClick={copy} class={`flex size-7 items-center justify-center rounded-control bg-surface
+          <button aria-label={t("common.copyCode")} onClick={copy} class={`flex size-7 items-center justify-center rounded-control bg-surface
               shadow-btn transition-colors duration-100 hover:bg-hover
               ${copied.value ? "text-green" : "text-ink-3 hover:text-ink"}`}>
             {copied.value ? <CheckIcon /> : <CopyIcon />}
           </button>
-          <button aria-label="View code" onClick={onOpen.value} class="flex size-7 items-center justify-center rounded-control bg-surface
+          <button aria-label={t("grid.viewCode")} onClick={onOpen.value} class="flex size-7 items-center justify-center rounded-control bg-surface
               text-ink-3 shadow-btn transition-colors duration-100
               hover:bg-hover hover:text-ink">
             <CodeIcon />
@@ -145,7 +146,7 @@ const Overlay = createComponent<{
     };
   }, () => [onClose.value]);
   return () => {
-    return <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label={`${entry.value.title} code`}>
+    return <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8" role="dialog" aria-modal="true" aria-label={t("grid.label0Code", [entry.value.title])}>
       <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px] dark:bg-black/55" style={cssStyle({
         animation: "fade-in 200ms ease-out both"
       })} onClick={onClose.value} />
@@ -157,24 +158,23 @@ const Overlay = createComponent<{
           <div class="min-w-0">
             <h3 class="text-[13px] font-semibold text-ink">{entry.value.title}</h3>
             <p class="truncate font-mono text-[11.5px] text-ink-3">
-              src/components/primitives/{entry.value.file}
+              {"src/components/primitives/"}{entry.value.file}
             </p>
             {entry.value.deps?.length || entry.value.npm?.length ? <p class="mt-1 text-[11.5px] leading-relaxed text-ink-3">
-                <span class="font-medium text-ink-2">Requires</span>
-                {entry.value.deps?.length ? <> · also copy {entry.value.deps.map(d => INTERNAL[d]?.title ?? d).join(", ")}</> : null}
-                {entry.value.npm?.length ? <> · <code class="rounded bg-inset px-1 py-0.5 font-mono text-[11px] text-ink-2">npm i {entry.value.npm.join(" ")}</code></> : null}
-              </p> : <p class="mt-1 text-[11.5px] text-ink-3">Registry includes Vue helpers, local imports, and foundation styles.</p>}
+                <span class="font-medium text-ink-2">{t("grid.requires")}</span>
+                {entry.value.deps?.length ? <>{(" " + t("grid.alsoCopy") + " ")}{entry.value.deps.map(d => INTERNAL[d]?.title ?? d).join(", ")}</> : null}
+                {entry.value.npm?.length ? <> {" · "}<code class="rounded bg-inset px-1 py-0.5 font-mono text-[11px] text-ink-2">{"npm i "}{entry.value.npm.join(" ")}</code></> : null}
+              </p> : <p class="mt-1 text-[11.5px] text-ink-3">{t("grid.registryIncludesVueHelpersLocalImportsAndFoundationStyles")}</p>}
             <p class="mt-1.5 truncate font-mono text-[11px] text-ink-3" title={`pnpm dlx shadcn-vue@latest add ${window.location.origin}/r/${entry.value.id}.json`}>
-              <span class="text-ink-2">$</span> pnpm dlx shadcn-vue@latest add {window.location.origin}/r/{entry.value.id}.json
-            </p>
+              <span class="text-ink-2">{"$"}</span>{" pnpm dlx shadcn-vue@latest add "}{window.location.origin}{"/r/"}{entry.value.id}{".json"}</p>
           </div>
           <div class="flex items-center gap-1.5">
             <button onClick={copy} class="flex h-7 items-center gap-1.5 rounded-control bg-ink px-2.5
                 text-[12.5px] font-medium text-canvas shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_1px_2px_rgba(16,24,40,0.1)]
                 transition-transform duration-150 active:scale-[0.98]">
-              {copied.value ? "Copied" : "Copy"}
+              {copied.value ? t("common.copied") : t("common.copy")}
             </button>
-            <button aria-label="Close" onClick={onClose.value} class="primitive-icon-button text-ink-3
+            <button aria-label={t("common.close")} onClick={onClose.value} class="primitive-icon-button text-ink-3
                 transition-colors duration-150 hover:bg-hover hover:text-ink">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                 <path d="M18 6L6 18M6 6l12 12" />
@@ -191,13 +191,11 @@ const Overlay = createComponent<{
             <path d="M12 8h.01M11 12h1v4h1" />
           </svg>
           <span class="min-w-0 flex-1 text-pretty">
-            Foundation required — paste{" "}
-            <code class="rounded bg-surface px-1 py-0.5 font-mono text-[11.5px] text-ink-2 shadow-hairline">src/styles/globals.css</code>{" "}
-            once and enable @vitejs/plugin-vue-jsx (tokens, <code class="font-mono text-ink-2">@theme</code> mappings, keyframes, reduced-motion).
-          </span>
+            {t("grid.foundationRequiredPaste")}{" "}
+            <code class="rounded bg-surface px-1 py-0.5 font-mono text-[11.5px] text-ink-2 shadow-hairline">{"src/styles/globals.css"}</code>{" "}
+            {(t("grid.onceAndEnableVitejsPluginVueJsxTokens") + " ")}<code class="font-mono text-ink-2">{"@theme"}</code>{(" " + t("grid.mappingsKeyframesReducedMotion"))}</span>
           <a href="/foundation.css" target="_blank" rel="noreferrer" class="flex shrink-0 items-center gap-1 font-medium text-ink transition-colors duration-150 hover:text-accent">
-            globals.css
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M14 5h5v5M19 5l-8 8" /></svg>
+            {"globals.css"}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden><path d="M14 5h5v5M19 5l-8 8" /></svg>
           </a>
         </div>
       </div>

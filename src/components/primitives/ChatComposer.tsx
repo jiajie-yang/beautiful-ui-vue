@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -17,17 +18,17 @@ export type ChatMessage = {
   body: string;
 };
 const MESSAGES: ChatMessage[] = [{
-  label: "Sales History",
-  sub: "Flavor Data",
-  time: "4s",
-  body: "Pulled 3 summers of mint chip sales for comparison."
+  get label() { return t("chatComposer.salesHistory"); },
+  get sub() { return t("chatComposer.flavorData"); },
+  get time() { return t("chatComposer.label4s"); },
+  get body() { return t("chatComposer.pulled3SummersOfMintChipSalesForComparison"); }
 }, {
-  label: "Comparison",
-  sub: "Trend Detection",
-  time: "2s",
-  body: "Mint chip is up 12% with stronger weekend peaks."
+  get label() { return t("chatComposer.comparison"); },
+  get sub() { return t("chatComposer.trendDetection"); },
+  get time() { return t("chatComposer.label2s"); },
+  get body() { return t("chatComposer.mintChipIsUp12WithStrongerWeekendPeaks"); }
 }];
-const SUGGESTIONS = ["Flavors", "Suppliers"];
+function defaultSuggestions() { return [t("chatComposer.flavors"), t("common.suppliers")]; }
 export type ChatComposerLabels = {
   /** the pre-filled prompt shown in the first user bubble */
   initialPrompt: string;
@@ -35,8 +36,8 @@ export type ChatComposerLabels = {
   placeholder: string;
 };
 const DEFAULT_LABELS: ChatComposerLabels = {
-  initialPrompt: "Compare mint chip to last summer",
-  placeholder: "Prompt or tag a flavor with @"
+  get initialPrompt() { return t("chatComposer.compareMintChipToLastSummer"); },
+  get placeholder() { return t("chatComposer.promptOrTagAFlavorWith"); }
 };
 const Section = createComponent<{
   label: string;
@@ -62,7 +63,7 @@ const Section = createComponent<{
       <div class="flex items-center gap-1 text-[12px] leading-[1.3]">
         <span class="font-medium text-ink">{label.value}</span>
         <span class="text-ink-2">{sub.value}</span>
-        <span class="text-ink">for {time.value}</span>
+        <span class="text-ink">{(t("common.for") + " ")}{time.value}</span>
       </div>
       <p class="text-[13px] leading-normal text-ink">{body.value}</p>
     </div>;
@@ -80,7 +81,7 @@ const ChatComposer = createComponent<{
   onSend?: (text: string) => void;
 }>("ChatComposer", ["variant", "messages", "suggestions", "labels", "onSend"], (__props, __slots) => {
   const messages = computed(() => __props.messages === undefined ? MESSAGES : __props.messages);
-  const suggestions = computed(() => __props.suggestions === undefined ? SUGGESTIONS : __props.suggestions);
+  const suggestions = computed(() => __props.suggestions === undefined ? defaultSuggestions() : __props.suggestions);
   const labels = computed(() => __props.labels);
   const onSend = computed(() => __props.onSend);
   const l = computed(() => ({
@@ -89,8 +90,9 @@ const ChatComposer = createComponent<{
   }));
   const [phase, setPhase] = createState<Phase>("done");
   const [draft, setDraft] = createState("");
+  const [userSubmitted, setUserSubmitted] = createState(false);
   const [submitted, setSubmitted] = createState(l.value.initialPrompt);
-  const [tab, setTab] = createState(suggestions.value[0] ?? "");
+  const [tab, setTab] = createState(0);
   const inputRef = templateRef<HTMLInputElement>(null);
   watchLifecycle(() => {
     let t: ReturnType<typeof setTimeout>;
@@ -103,6 +105,7 @@ const ChatComposer = createComponent<{
     if (!canSend.value) return;
     const text = draft.value.trim();
     setSubmitted(text);
+    setUserSubmitted(true);
     onSend.value?.(text);
     setDraft("");
     setPhase("sent");
@@ -112,12 +115,12 @@ const ChatComposer = createComponent<{
       {/* header — tabs + actions */}
       <div class="flex shrink-0 items-center justify-between border-b border-line p-1.5">
         <div class="flex items-center">
-          {suggestions.value.map(item => <button key={item} type="button" aria-pressed={tab.value === item} onClick={() => setTab(item)} class={`rounded-[6px] px-2 py-[3px] text-[13px] text-ink transition-[background-color,opacity] duration-100 ${tab.value === item ? "bg-field" : "opacity-50 hover:opacity-75"}`}>
+          {suggestions.value.map((item, index) => <button key={item} type="button" aria-pressed={tab.value === index} onClick={() => setTab(index)} class={`rounded-[6px] px-2 py-[3px] text-[13px] text-ink transition-[background-color,opacity] duration-100 ${tab.value === index ? "bg-field" : "opacity-50 hover:opacity-75"}`}>
               {item}
             </button>)}
         </div>
         <div class="flex items-center gap-1">
-          {[<path key="p" d="M12 5v14M5 12h14" />, <g key="h"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></g>, <g key="e" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></g>].map((icon, i) => <button key={i} type="button" aria-label="Action" class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
+          {[<path key="p" d="M12 5v14M5 12h14" />, <g key="h"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></g>, <g key="e" fill="currentColor" stroke="none"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></g>].map((icon, i) => <button key={i} type="button" aria-label={t("common.action")} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
                 transition-colors duration-100 hover:bg-hover hover:text-ink-2">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 {icon}
@@ -136,7 +139,7 @@ const ChatComposer = createComponent<{
             transform: sent.value ? "translateY(0)" : "translateY(10px)",
             transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)"
           })}>
-            {submitted.value}
+            {userSubmitted.value ? submitted.value : l.value.initialPrompt}
           </div>
         </div>
 
@@ -148,10 +151,11 @@ const ChatComposer = createComponent<{
       <div class="mt-auto shrink-0 p-1.5">
         <div role="presentation" onClick={() => inputRef.value?.focus()} class="flex cursor-text flex-col gap-2 rounded-control border border-line bg-field p-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.035)] transition-[border-color,box-shadow] duration-150 focus-within:border-line-strong focus-within:shadow-[0_1px_2px_rgba(0,0,0,0.025)]">
           <input ref={inputRef} value={draft.value} onInput={event => setDraft((event.target as HTMLInputElement).value)} onKeydown={event => {
+              if (event.isComposing || event.keyCode === 229) return;
             if (event.key === "Enter") send();
-          }} placeholder={l.value.placeholder} aria-label="Chat prompt" class="min-h-4.5 bg-transparent text-[13px] leading-[1.4] text-ink outline-none placeholder:text-ink-3" />
+          }} placeholder={l.value.placeholder} aria-label={t("chatComposer.chatPrompt")} class="min-h-4.5 bg-transparent text-[13px] leading-[1.4] text-ink outline-none placeholder:text-ink-3" />
           <div class="flex items-center justify-end">
-            <button type="button" aria-label="Send" disabled={!canSend.value} onClick={send} class="flex size-7 items-center justify-center rounded-[8px]
+            <button type="button" aria-label={t("common.send")} disabled={!canSend.value} onClick={send} class="flex size-7 items-center justify-center rounded-[8px]
                 transition-[background-color,color,transform] duration-200 enabled:active:scale-[0.96]" style={cssStyle({
               background: canSend.value ? "var(--ink)" : "var(--line-strong)",
               color: canSend.value ? "var(--surface)" : "var(--ink-2)"

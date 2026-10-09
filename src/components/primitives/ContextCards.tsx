@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -20,20 +21,20 @@ export type ContextCardsLabels = {
   count: string;
 };
 const DEFAULT_LABELS: ContextCardsLabels = {
-  header: "All chunks",
+  get header() { return t("contextCards.allChunks"); },
   count: "32"
 };
 const CHUNKS: ContextChunk[] = [{
-  title: "Vendor onboarding rule",
-  chars: "290 characters",
-  body: "Cold-chain certification must be verified before a new dairy can be added to the reorder workflow.",
+  get title() { return t("contextCards.vendorOnboardingRule"); },
+  get chars() { return t("contextCards.label290Characters"); },
+  get body() { return t("contextCards.coldChainCertificationMustBeVerifiedBeforeANew"); },
   source: "Dairy Onboarding SOP.pdf",
   badge: "PDF",
   tone: "bg-red"
 }, {
-  title: "Seasonal demand row",
-  chars: "1,250 characters",
-  body: "Q4 velocity table: pistachio +18%, vanilla +6%, rocky road -11%; retire flavors below 40 scoops weekly.",
+  get title() { return t("contextCards.seasonalDemandRow"); },
+  get chars() { return t("contextCards.label1250Characters"); },
+  get body() { return t("contextCards.q4VelocityTablePistachio18Vanilla6RockyRoad"); },
   source: "Sales Velocity Export.csv",
   badge: "CSV",
   tone: "bg-green"

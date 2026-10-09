@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -16,23 +17,24 @@ export type SearchListLabels = {
   emptyTitle: string;
   emptyHint: string;
 };
-const ITEMS: SearchItem[] = ["Forecast summer demand", "Find waffle cone suppliers", "Compare seasonal flavors", "Draft flavor launch plan", "Check cold-chain status", "Audit sugar costs", "Retire low sellers"];
+const ITEM_KEYS = ["searchList.forecastSummerDemand", "searchList.findWaffleConeSuppliers", "searchList.compareSeasonalFlavors", "searchList.draftFlavorLaunchPlan", "searchList.checkColdChainStatus", "searchList.auditSugarCosts", "searchList.retireLowSellers"] as const;
+function defaultItems() { return ITEM_KEYS.map(key => t(key)); }
 const LABELS: SearchListLabels = {
-  placeholder: "Search flavors…",
-  ariaLabel: "Search flavors",
-  emptyTitle: "No results found",
-  emptyHint: "Adjust your search to try again"
+  get placeholder() { return t("searchList.searchFlavors"); },
+  get ariaLabel() { return t("searchList.searchFlavors2"); },
+  get emptyTitle() { return t("searchList.noResultsFound"); },
+  get emptyHint() { return t("searchList.adjustYourSearchToTryAgain"); }
 };
 const SearchList = createComponent<{
   items?: SearchItem[];
   labels?: SearchListLabels;
   variant?: string;
 }>("SearchList", ["items", "labels", "variant"], (__props, __slots) => {
-  const items = computed(() => __props.items === undefined ? ITEMS : __props.items);
+  const items = computed(() => __props.items === undefined ? defaultItems() : __props.items);
   const labels = computed(() => __props.labels === undefined ? LABELS : __props.labels);
   const [query, setQuery] = createState("");
-  const results = computed(() => query.value ? items.value.filter(i => i.toLowerCase().includes(query.value.toLowerCase())) : items.value.slice(0, 5));
-  const empty = computed(() => query.value.length > 2 && results.value.length === 0);
+  const results = computed(() => query.value ? items.value.filter((item, index) => item.toLowerCase().includes(query.value.toLowerCase()) || (__props.items === undefined && t(ITEM_KEYS[index], {}, { locale: "en" }).toLowerCase().includes(query.value.toLowerCase()))) : items.value.slice(0, 5));
+  const empty = computed(() => query.value.trim().length > 0 && results.value.length === 0);
   return () => {
     return <div class="flex min-h-[248px] w-full max-w-72 flex-col items-stretch">
       <div class="w-full self-start overflow-hidden rounded-card bg-surface shadow-raised">
@@ -43,7 +45,7 @@ const SearchList = createComponent<{
             <path d="M21 21l-4.3-4.3" />
           </svg>
           <input value={query.value} onInput={event => setQuery((event.target as HTMLInputElement).value)} placeholder={labels.value.placeholder} aria-label={labels.value.ariaLabel} class="min-w-0 flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-3" />
-          {query.value && <button aria-label="Clear search" type="button" onClick={() => setQuery("")} class="flex size-6 items-center justify-center rounded-full text-ink-3
+          {query.value && <button aria-label={t("searchList.clearSearch")} type="button" onClick={() => setQuery("")} class="flex size-6 items-center justify-center rounded-full text-ink-3
                 transition-colors duration-100 hover:bg-line/70 hover:text-ink" style={cssStyle({
             animation: "fade-in 150ms ease-out both"
           })}>

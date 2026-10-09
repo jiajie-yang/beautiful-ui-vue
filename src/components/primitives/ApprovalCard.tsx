@@ -1,3 +1,4 @@
+import { t, locale } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -21,17 +22,17 @@ export type ApprovalQuestion = {
   options: string[];
 };
 const QUESTIONS: ApprovalQuestion[] = [{
-  q: "How many flavors should we launch?",
+  get q() { return t("approvalCard.howManyFlavorsShouldWeLaunch"); },
   type: "radio",
-  options: ["Three (core line)", "Five (full case)", "Just one hero"]
+  get options() { return [t("approvalCard.threeCoreLine"), t("approvalCard.fiveFullCase"), t("approvalCard.justOneHero")]; }
 }, {
-  q: "Which mix-ins should we stock?",
+  get q() { return t("approvalCard.whichMixInsShouldWeStock"); },
   type: "check",
-  options: ["Chocolate chips", "Waffle bits", "Sprinkles"]
+  get options() { return [t("approvalCard.chocolateChips"), t("approvalCard.waffleBits"), t("approvalCard.sprinkles")]; }
 }, {
-  q: "Which market do we enter first?",
+  get q() { return t("approvalCard.whichMarketDoWeEnterFirst"); },
   type: "radio",
-  options: ["Food trucks", "Grocery freezers", "Scoop shops"]
+  get options() { return [t("approvalCard.foodTrucks"), t("approvalCard.groceryFreezers"), t("approvalCard.scoopShops")]; }
 }];
 export type ApprovalLabels = {
   skip: string;
@@ -41,11 +42,11 @@ export type ApprovalLabels = {
   sentMessage: string;
 };
 const DEFAULT_LABELS: ApprovalLabels = {
-  skip: "Skip",
-  continue: "Continue",
-  send: "Send",
-  customPlaceholder: "Something else…",
-  sentMessage: "Answers sent"
+  get skip() { return t("common.skip"); },
+  get continue() { return t("approvalCard.continue"); },
+  get send() { return t("common.send"); },
+  get customPlaceholder() { return t("approvalCard.somethingElse"); },
+  get sentMessage() { return t("approvalCard.answersSent"); }
 };
 const ROLL_MS = 400;
 const SLIDE = "360ms cubic-bezier(0.22, 1, 0.36, 1)";
@@ -157,7 +158,7 @@ const ApprovalCard = createComponent<{
   const onSubmitted = computed(() => __props.onSubmitted);
   const onAnswerChange = computed(() => __props.onAnswerChange);
   const resettable = computed(() => __props.resettable === undefined ? true : __props.resettable);
-  const t = computed(() => ({
+  const copy = computed(() => ({
     ...DEFAULT_LABELS,
     ...labels.value
   }));
@@ -193,7 +194,7 @@ const ApprovalCard = createComponent<{
     sync(withAnim);
     setReady(true);
     
-  }, () => [qi.value, answers.value, custom.value, open.value, sent.value]);
+  }, () => [qi.value, answers.value, custom.value, open.value, sent.value, locale.value]);
   watchLifecycle(() => {
     const id = requestAnimationFrame(() => sync(measured.value));
     return () => cancelAnimationFrame(id);
@@ -247,8 +248,7 @@ const ApprovalCard = createComponent<{
   return () => {
     if (!open.value) {
       return <button type="button" onClick={() => setOpen(true)} class="rounded-control bg-surface px-3 py-2 text-[12.5px] font-medium text-ink shadow-btn transition-colors duration-150 hover:bg-hover">
-        Open approval
-      </button>;
+        {t("approvalCard.openApproval")}</button>;
     }
     if (sent.value) {
       return <div class="flex w-full max-w-80 items-center gap-3" style={cssStyle({
@@ -258,18 +258,17 @@ const ApprovalCard = createComponent<{
           <span class="flex size-4.5 items-center justify-center rounded-full bg-green text-white">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
           </span>
-          {t.value.sentMessage}
+          {copy.value.sentMessage}
         </span>
         {resettable.value && <button type="button" onClick={reset} class="text-[12px] font-medium text-ink-3 transition-colors duration-150 hover:text-ink">
-            Start over
-          </button>}
+            {t("approvalCard.startOver")}</button>}
       </div>;
     }
     return <div class="w-full max-w-80">
       <div class="relative overflow-hidden rounded-card bg-surface shadow-card" style={cssStyle({
         animation: "fade-up 380ms cubic-bezier(0.23,1,0.32,1) both"
       })}>
-        <button type="button" aria-label="Dismiss" onClick={() => setOpen(false)} class="primitive-icon-button absolute right-2.5 top-2.5 z-10 text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
+        <button type="button" aria-label={t("approvalCard.dismiss")} onClick={() => setOpen(false)} class="primitive-icon-button absolute right-2.5 top-2.5 z-10 text-ink-3 transition-colors duration-100 hover:bg-hover hover:text-ink">
           <Ico size={14} sw={2.2} path={<path d="M18 6L6 18M6 6l12 12" />} />
         </button>
         <div class="primitive-card-pad">
@@ -331,11 +330,12 @@ const ApprovalCard = createComponent<{
                           [qIdx]: []
                         }));
                       }} onKeydown={event => {
+              if (event.isComposing || event.keyCode === 229) return;
                         if (event.key === "Enter" && hasAnswer.value) {
                           event.preventDefault();
                           advance();
                         }
-                      }} placeholder={t.value.customPlaceholder} aria-label="Custom answer" class="min-w-0 flex-1 bg-transparent pl-1.5 text-[13px] text-ink outline-none placeholder:text-ink-3" />
+                      }} placeholder={copy.value.customPlaceholder} aria-label={t("approvalCard.customAnswer")} class="min-w-0 flex-1 bg-transparent pl-1.5 text-[13px] text-ink outline-none placeholder:text-ink-3" />
                       </label>
                     </GlideMenu>
                   </div>;
@@ -347,7 +347,7 @@ const ApprovalCard = createComponent<{
         {/* footer — step nav (rolling counter) + pill actions */}
         <div class="primitive-card-footer flex items-center justify-between gap-3">
           <div class="flex items-center gap-1 text-ink-3">
-            <button type="button" aria-label="Previous question" disabled={qi.value <= 0} onClick={() => goTo(qi.value - 1)} class="flex size-[18px] items-center justify-center rounded-[5px] transition-colors duration-100 enabled:hover:text-ink disabled:opacity-30">
+            <button type="button" aria-label={t("approvalCard.previousQuestion")} disabled={qi.value <= 0} onClick={() => goTo(qi.value - 1)} class="flex size-[18px] items-center justify-center rounded-[5px] transition-colors duration-100 enabled:hover:text-ink disabled:opacity-30">
               <Ico size={14} path={<path d="M18 15l-6-6-6 6" />} />
             </button>
             <span class="inline-flex items-center text-[12px] font-medium tabular-nums text-ink-3" style={cssStyle({
@@ -356,17 +356,17 @@ const ApprovalCard = createComponent<{
             })}>
               <RollingDigits value={`${qi.value + 1} / ${questions.value.length}`} />
             </span>
-            <button type="button" aria-label="Next question" disabled={last.value} onClick={() => goTo(qi.value + 1)} class="flex size-[18px] items-center justify-center rounded-[5px] transition-colors duration-100 enabled:hover:text-ink disabled:opacity-30">
+            <button type="button" aria-label={t("approvalCard.nextQuestion")} disabled={last.value} onClick={() => goTo(qi.value + 1)} class="flex size-[18px] items-center justify-center rounded-[5px] transition-colors duration-100 enabled:hover:text-ink disabled:opacity-30">
               <Ico size={14} path={<path d="M6 9l6 6 6-6" />} />
             </button>
           </div>
 
           <div class="-mr-0.5 flex items-center gap-1.5">
             <Button variant="ghost" size="sm" onClick={() => last.value ? setOpen(false) : goTo(qi.value + 1)}>
-              {t.value.skip}
+              {copy.value.skip}
             </Button>
             <Button variant="accent" size="sm" disabled={!hasAnswer.value} onClick={advance}>
-              {last.value ? t.value.send : t.value.continue}
+              {last.value ? copy.value.send : copy.value.continue}
             </Button>
           </div>
         </div>

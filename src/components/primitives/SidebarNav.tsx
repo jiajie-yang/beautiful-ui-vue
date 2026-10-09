@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -26,16 +27,16 @@ import GlideMenu from "@/components/primitives/GlideMenu";
 
 const WORKSPACE = {
   key: "creamery",
-  name: "Creamery Ops",
+  get name() { return t("sidebarNav.creameryOps"); },
   monogram: "C"
 };
 const NAV_ITEMS = [{
   key: "home",
-  label: "Home",
+  get label() { return t("common.home"); },
   icon: <IconHome size={18} />
 }, {
   key: "invite",
-  label: "Invite users",
+  get label() { return t("sidebarNav.inviteUsers"); },
   icon: <IconUserAdd size={18} />,
   count: "3/10"
 }];
@@ -43,33 +44,44 @@ export type SidebarRecent = {
   id: string;
   label: string;
   prompt?: string;
+  searchText?: string;
 };
 const DEFAULT_RECENTS: SidebarRecent[] = [{
   id: "suppliers",
-  label: "Supplier records"
+  get label() { return t("common.supplierRecords"); },
+  get searchText() { return t("common.supplierRecords", {}, { locale: "en" }); }
 }, {
   id: "todos",
-  label: "Urgent to-dos this morning"
+  get label() { return t("common.urgentToDosThisMorning"); },
+  get searchText() { return t("common.urgentToDosThisMorning", {}, { locale: "en" }); }
 }, {
   id: "flavor",
-  label: "Flavor page ticket"
+  get label() { return t("common.flavorPageTicket"); },
+  get searchText() { return t("common.flavorPageTicket", {}, { locale: "en" }); }
 }, {
   id: "workload",
-  label: "Workload summary"
+  get label() { return t("common.workloadSummary"); },
+  get searchText() { return t("common.workloadSummary", {}, { locale: "en" }); }
 }, {
   id: "offboarding",
-  label: "Off-board a supplier"
+  get label() { return t("common.offBoardASupplier"); },
+  get searchText() { return t("common.offBoardASupplier", {}, { locale: "en" }); }
 }, {
   id: "restock",
-  label: "Batch restock function"
+  get label() { return t("common.batchRestockFunction"); },
+  get searchText() { return t("common.batchRestockFunction", {}, { locale: "en" }); }
 }, {
   id: "edits",
-  label: "Propose flavor edits"
+  get label() { return t("common.proposeFlavorEdits"); },
+  get searchText() { return t("common.proposeFlavorEdits", {}, { locale: "en" }); }
 }, {
   id: "subway",
-  label: "Subway surfing"
+  get label() { return t("common.subwaySurfing"); },
+  get searchText() { return t("common.subwaySurfing", {}, { locale: "en" }); }
 }];
 type SidebarNavProps = {
+  /** Stable selection for recents whose labels change with the locale. */
+  activeRecentId?: string | null;
   activeTitle?: string | null;
   className?: string;
   fill?: boolean;
@@ -170,13 +182,13 @@ const WorkspaceMenu = createComponent<{
         </button>
         <div class="my-1 h-px bg-line" />
         {[{
-          label: "New workspace",
+          get label() { return t("sidebarNav.newWorkspace"); },
           icon: <IconPlusMedium size={16} />
         }, {
-          label: "Workspace settings",
+          get label() { return t("sidebarNav.workspaceSettings"); },
           icon: <IconSettingsGear1 size={16} />
         }, {
-          label: "Invite team members",
+          get label() { return t("sidebarNav.inviteTeamMembers"); },
           icon: <IconUserAdd size={16} />
         }].map(item => <button key={item.label} data-menu-row type="button" onClick={onClose.value} class="relative z-10 flex h-9 w-full items-center gap-1.5 rounded-[8px] px-2 text-left">
             <span class="flex size-5 shrink-0 items-center justify-center text-ink-2">{item.icon}</span>
@@ -185,13 +197,14 @@ const WorkspaceMenu = createComponent<{
         <div class="my-1 h-px bg-line" />
         <button data-menu-row type="button" onClick={onClose.value} class="relative z-10 flex h-9 w-full items-center gap-1.5 rounded-[8px] px-2 text-left">
           <span class="flex size-5 shrink-0 items-center justify-center text-ink-2"><IconArrowBoxLeft size={16} /></span>
-          <span class="min-w-0 flex-1 truncate text-[13.5px] text-ink">Sign out</span>
+          <span class="min-w-0 flex-1 truncate text-[13.5px] text-ink">{t("sidebarNav.signOut")}</span>
         </button>
       </GlideMenu>
     </div>, document.body);
   };
 });
-const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle", "className", "fill", "onNewChat", "onPick", "activeNav", "onNavigate", "footerLabel", "footerIcon", "onFooterClick", "recents", "variant"], (__props, __slots) => {
+const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeRecentId", "activeTitle", "className", "fill", "onNewChat", "onPick", "activeNav", "onNavigate", "footerLabel", "footerIcon", "onFooterClick", "recents", "variant"], (__props, __slots) => {
+  const activeRecentId = computed(() => __props.activeRecentId);
   const activeTitle = computed(() => __props.activeTitle);
   const className = computed(() => __props.className === undefined ? "" : __props.className);
   const fill = computed(() => __props.fill === undefined ? false : __props.fill);
@@ -199,7 +212,7 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
   const onPick = computed(() => __props.onPick);
   const activeNav = computed(() => __props.activeNav);
   const onNavigate = computed(() => __props.onNavigate);
-  const footerLabel = computed(() => __props.footerLabel === undefined ? "Upgrade" : __props.footerLabel);
+  const footerLabel = computed(() => __props.footerLabel === undefined ? t("sidebarNav.upgrade") : __props.footerLabel);
   const footerIcon = computed(() => __props.footerIcon);
   const onFooterClick = computed(() => __props.onFooterClick);
   const recents = computed(() => __props.recents === undefined ? DEFAULT_RECENTS : __props.recents);
@@ -210,7 +223,7 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
     setInternalNav(key);
     onNavigate.value?.(key);
   };
-  const [demoActiveTitle, setDemoActiveTitle] = createState<string | null>(null);
+  const [demoActiveId, setDemoActiveId] = createState<string | null>(null);
   const [workspaceOpen, setWorkspaceOpen] = createState(false);
   const [workspacePosition, setWorkspacePosition] = createState({
     top: 0,
@@ -220,8 +233,8 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
   const [query, setQuery] = createState("");
   const workspaceButtonRef = templateRef<HTMLButtonElement>(null);
   const searchRef = templateRef<HTMLInputElement>(null);
-  const selectedTitle = computed(() => activeTitle.value === undefined ? demoActiveTitle.value : activeTitle.value);
-  const visibleRecents = computed(() => recents.value.filter(item => item.label.toLowerCase().includes(query.value.trim().toLowerCase())));
+  const selectedId = computed(() => activeRecentId.value !== undefined ? activeRecentId.value : activeTitle.value !== undefined ? recents.value.find(item => item.label === activeTitle.value)?.id ?? null : demoActiveId.value);
+  const visibleRecents = computed(() => recents.value.filter(item => item.label.toLowerCase().includes(query.value.trim().toLowerCase()) || !!item.searchText?.toLowerCase().includes(query.value.trim().toLowerCase())));
   watchLifecycle(() => {
     if (!workspaceOpen.value) return;
     const close = (event: PointerEvent) => {
@@ -243,7 +256,7 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
     setQuery("");
   };
   return () => {
-    return <aside data-sidebar-collapsed={collapsed.value} aria-label="Workspace navigation" class={`relative flex shrink-0 overflow-hidden transition-[width] ${fill.value ? "h-full" : "h-[600px]"} ${className.value}`} style={cssStyle({
+    return <aside data-sidebar-collapsed={collapsed.value} aria-label={t("sidebarNav.workspaceNavigation")} class={`relative flex shrink-0 overflow-hidden transition-[width] ${fill.value ? "h-full" : "h-[600px]"} ${className.value}`} style={cssStyle({
       width: collapsed.value ? SIDEBAR_MOTION.collapsedWidth : SIDEBAR_MOTION.expandedWidth,
       transitionDuration: `${SIDEBAR_MOTION.duration}ms`,
       transitionTimingFunction: SIDEBAR_MOTION.easing,
@@ -276,17 +289,17 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
 
           {workspaceOpen.value && <WorkspaceMenu position={workspacePosition.value} onClose={() => setWorkspaceOpen(false)} />}
 
-          <button type="button" aria-label="Collapse sidebar" aria-hidden={collapsed.value} tabindex={collapsed.value ? -1 : 0} onClick={collapse} class="sidebar-collapse-control absolute right-2 top-1 flex size-8 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color] duration-150 hover:bg-hover-2 hover:text-ink">
+          <button type="button" aria-label={t("sidebarNav.collapseSidebar")} aria-hidden={collapsed.value} tabindex={collapsed.value ? -1 : 0} onClick={collapse} class="sidebar-collapse-control absolute right-2 top-1 flex size-8 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color] duration-150 hover:bg-hover-2 hover:text-ink">
             <IconSidebarLeftArrow size={18} />
           </button>
-          <button type="button" aria-label="Expand sidebar" aria-hidden={!collapsed.value} tabindex={collapsed.value ? 0 : -1} onClick={() => setCollapsed(false)} class="sidebar-expand-control absolute left-2 top-0.5 flex size-9 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color] duration-150 hover:bg-hover-2 hover:text-ink">
+          <button type="button" aria-label={t("sidebarNav.expandSidebar")} aria-hidden={!collapsed.value} tabindex={collapsed.value ? 0 : -1} onClick={() => setCollapsed(false)} class="sidebar-expand-control absolute left-2 top-0.5 flex size-9 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color] duration-150 hover:bg-hover-2 hover:text-ink">
             <IconSidebarLeftArrow size={18} className="rotate-180" />
           </button>
         </div>
 
         <GlideGroup>
-          <RailButton icon={<IconEditBig size={18} />} label="New chat" onClick={() => {
-            if (activeTitle.value === undefined) setDemoActiveTitle(null);
+          <RailButton icon={<IconEditBig size={18} />} label={t("common.newChat")} onClick={() => {
+            if (activeRecentId.value === undefined && activeTitle.value === undefined) setDemoActiveId(null);
             selectNav("chats");
             onNewChat.value?.();
           }} />
@@ -300,10 +313,10 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
               transitionTimingFunction: CHAT_SEARCH_MOTION.easing
             })}>
               <IconChevronDownSmall size={16} />
-              <span>Chats</span>
+              <span>{t("sidebarNav.chats")}</span>
             </div>
 
-            <button type="button" aria-label="Search chats" aria-expanded={searchOpen.value} onClick={() => setSearchOpen(true)} class={`absolute right-0 top-0 z-10 flex size-8 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color,transform] hover:bg-hover-2 hover:text-ink active:scale-[0.96] ${searchOpen.value ? "pointer-events-none opacity-0" : "opacity-100"}`} style={cssStyle({
+            <button type="button" aria-label={t("sidebarNav.searchChats")} aria-expanded={searchOpen.value} onClick={() => setSearchOpen(true)} class={`absolute right-0 top-0 z-10 flex size-8 items-center justify-center rounded-[8px] text-ink-3 transition-[opacity,background-color,color,transform] hover:bg-hover-2 hover:text-ink active:scale-[0.96] ${searchOpen.value ? "pointer-events-none opacity-0" : "opacity-100"}`} style={cssStyle({
               transitionDuration: `${CHAT_SEARCH_MOTION.duration}ms`
             })}>
               <IconMagnifyingGlass size={16} />
@@ -322,8 +335,8 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
                   setSearchOpen(false);
                   setQuery("");
                 }
-              }} placeholder="Search chats" aria-label="Search chat history" class="ml-1.5 min-w-0 flex-1 bg-transparent text-[13px] font-medium text-ink outline-none placeholder:text-ink-3" />
-              <button type="button" aria-label="Close chat search" onClick={() => {
+              }} placeholder={t("sidebarNav.searchChats")} aria-label={t("sidebarNav.searchChatHistory")} class="ml-1.5 min-w-0 flex-1 bg-transparent text-[13px] font-medium text-ink outline-none placeholder:text-ink-3" />
+              <button type="button" aria-label={t("sidebarNav.closeChatSearch")} onClick={() => {
                 setSearchOpen(false);
                 setQuery("");
               }} class="flex size-8 shrink-0 items-center justify-center rounded-[8px] text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-hover-2 hover:text-ink active:scale-[0.96]">
@@ -334,10 +347,10 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
 
           <GlideGroup>
             {visibleRecents.value.map(item => {
-              const active = item.label === selectedTitle.value;
+              const active = item.id === selectedId.value;
               return <button key={item.id} data-row type="button" title={item.label} onClick={() => {
                 selectNav("chats");
-                if (activeTitle.value === undefined) setDemoActiveTitle(item.label);
+                if (activeRecentId.value === undefined && activeTitle.value === undefined) setDemoActiveId(item.id);
                 onPick.value?.(item.id, item.label, item.prompt);
               }} class={`sidebar-row relative z-10 mx-2 flex h-8 items-center rounded-[8px] px-2 text-left transition-[width,background-color,color,transform] duration-150 active:scale-[0.98] ${active ? "bg-hover-2 group-hover/glide:bg-transparent" : ""}`}>
                   <span class={`sidebar-copy min-w-0 flex-1 truncate text-[14px] font-medium ${active ? "text-ink" : "text-ink-2"}`}>
@@ -345,7 +358,7 @@ const SidebarNav = createComponent<SidebarNavProps>("SidebarNav", ["activeTitle"
                   </span>
                 </button>;
             })}
-            {query.value && visibleRecents.value.length === 0 && <div class="sidebar-copy mx-2 px-2 py-2 text-[12.5px] text-ink-3">No chats found</div>}
+            {query.value && visibleRecents.value.length === 0 && <div class="sidebar-copy mx-2 px-2 py-2 text-[12.5px] text-ink-3">{t("sidebarNav.noChatsFound")}</div>}
           </GlideGroup>
         </div>
 

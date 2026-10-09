@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -16,9 +17,6 @@ import { StreamText } from "@/components/atoms/StreamText";
  * tokens.
  * ───────────────────────────────────────────────────────── */
 
-const LEAD = "Pistachio holds the top slot all weekend. ";
-const PICKED = "Churn it first thing Saturday so the batch has time to firm up before the afternoon rush.";
-const REWRITE = "Churn pistachio first thing Saturday so the batch has time to fully firm before the afternoon rush.";
 
 /* The passage: lead-in text, the selected `original`, and the streamed `rewrite`. */
 export type SelectionText = {
@@ -31,6 +29,7 @@ export type SelectionText = {
  * (e.g. Explain); `busyLabel` is the gerund shown while it runs. */
 export type SelectionAction = {
   id: string;
+  label?: string;
   icon: VNodeChild;
   action?: string;
   busyLabel?: string;
@@ -49,14 +48,14 @@ export type SelectionActionsLabels = {
   placeholder: string;
 };
 const DEFAULT_TEXT: SelectionText = {
-  lead: LEAD,
-  original: PICKED,
-  rewrite: REWRITE
+  get lead() { return t("selectionActions.pistachioHoldsTheTopSlotAllWeekend") + " "; },
+  get original() { return t("selectionActions.churnItFirstThingSaturdaySoTheBatchHas"); },
+  get rewrite() { return t("selectionActions.churnPistachioFirstThingSaturdaySoTheBatchHas"); }
 };
 const DEFAULT_LABELS: SelectionActionsLabels = {
-  keep: "Keep",
-  discard: "Discard",
-  placeholder: "Describe edits"
+  get keep() { return t("selectionActions.keep"); },
+  get discard() { return t("selectionActions.discard"); },
+  get placeholder() { return t("selectionActions.describeEdits"); }
 };
 type Mode = "idle" | "thinking" | "streaming" | "result";
 const iconProps = {
@@ -84,25 +83,30 @@ const primary = "inline-flex h-7 shrink-0 items-center gap-1 rounded-full bg-ink
 const DEFAULT_ACTIONS: SelectionActionSet = {
   primary: [{
     id: "Explain",
+    get label() { return t("selectionActions.explain"); },
     icon: icons.explain
   }, {
     id: "Improve",
+    get label() { return t("selectionActions.improve"); },
     icon: icons.improve,
     action: "Improve",
-    busyLabel: "Improving"
+    get busyLabel() { return t("selectionActions.improving"); }
   }],
   more: [{
     id: "Shorten",
+    get label() { return t("selectionActions.shorten"); },
     icon: icons.shorten,
     action: "Shorten",
-    busyLabel: "Shortening"
+    get busyLabel() { return t("selectionActions.shortening"); }
   }, {
     id: "Tone",
+    get label() { return t("selectionActions.tone"); },
     icon: icons.tone,
     action: "Change tone",
-    busyLabel: "Changing tone"
+    get busyLabel() { return t("selectionActions.changingTone"); }
   }, {
     id: "Grammar",
+    get label() { return t("selectionActions.grammar"); },
     icon: icons.grammar,
     action: "Fix grammar"
   }]
@@ -259,7 +263,7 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
   const hasPrompt = computed(() => prompt.value.trim().length > 0);
   const busyLabelMap = computed(() => Object.fromEntries([...actions.value.primary, ...actions.value.more]
     .filter(item => item.action && item.busyLabel).map(item => [item.action!, item.busyLabel!])));
-  const busyLabel = computed(() => busyLabelMap.value[action.value] ?? "Editing");
+  const busyLabel = computed(() => busyLabelMap.value[action.value] ?? t("selectionActions.editing"));
   return () => {
     return <div class="w-full max-w-[460px]">
       <div ref={hostRef} class="relative select-none pb-12">
@@ -293,8 +297,7 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
                   animation: "spin 700ms linear infinite"
                 })} />
                 {mode.value === "thinking" ? <Shimmer className="text-[12.5px] font-normal">
-                    {busyLabel.value}…
-                  </Shimmer> : <span>{busyLabel.value}…</span>}
+                    {busyLabel.value}{"…"}</Shimmer> : <span>{busyLabel.value}{"…"}</span>}
               </span>}
 
             {mode.value === "result" && <>
@@ -307,7 +310,7 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
                   {copy.value.discard}
                 </Button>
                 <span class="mx-0.5 h-4 w-px shrink-0 bg-line" />
-                <button type="button" aria-label="Try again" onClick={() => run(action.value)} class="flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-hover-2 hover:text-ink-2 active:scale-[0.96]">
+                <button type="button" aria-label={t("selectionActions.tryAgain")} onClick={() => run(action.value)} class="flex size-7 shrink-0 items-center justify-center rounded-full text-ink-3 transition-[background-color,color,transform] duration-150 hover:bg-hover-2 hover:text-ink-2 active:scale-[0.96]">
                   {icons.retry}
                 </button>
               </>}
@@ -345,9 +348,9 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
                   transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)"
                 })}>
                   {!expanded.value && <span class="mx-1 h-4 w-px shrink-0 bg-line-strong" />}
-                  {actions.value.primary.map(item => <Button key={item.id} type="button" variant="quiet" size="xs" className="shrink-0" onClick={item.action ? () => run(item.action!) : undefined}>
+                  {actions.value.primary.map(item => <Button key={item.label ?? item.id} type="button" variant="quiet" size="xs" className="shrink-0" onClick={item.action ? () => run(item.action!) : undefined}>
                       {item.icon}
-                      {item.id}
+                      {item.label ?? item.id}
                     </Button>)}
 
                   <div class="flex min-w-0 items-center gap-0.5 overflow-hidden transition-[max-width,opacity,margin] duration-400" style={cssStyle({
@@ -356,14 +359,14 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
                     marginLeft: expanded.value ? 2 : 0,
                     transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)"
                   })}>
-                  {actions.value.more.map(item => <Button key={item.id} type="button" variant="quiet" size="xs" className="shrink-0" onClick={item.action ? () => run(item.action!) : undefined}>
+                  {actions.value.more.map(item => <Button key={item.label ?? item.id} type="button" variant="quiet" size="xs" className="shrink-0" onClick={item.action ? () => run(item.action!) : undefined}>
                       {item.icon}
-                      {item.id}
+                      {item.label ?? item.id}
                     </Button>)}
                   </div>
 
                   <span class="mx-0.5 h-4 w-px shrink-0 bg-line" />
-                  <button type="button" aria-label={expanded.value ? "Show fewer actions" : "Show more actions"} aria-expanded={expanded.value} onClick={() => setExpanded(value => !value)} class="flex size-7 shrink-0 items-center justify-center rounded-full text-ink transition-[background-color,transform] duration-200 hover:bg-hover active:scale-[0.96]">
+                  <button type="button" aria-label={expanded.value ? t("selectionActions.showFewerActions") : t("selectionActions.showMoreActions")} aria-expanded={expanded.value} onClick={() => setExpanded(value => !value)} class="flex size-7 shrink-0 items-center justify-center rounded-full text-ink transition-[background-color,transform] duration-200 hover:bg-hover active:scale-[0.96]">
                     <span class="flex transition-transform duration-400" style={cssStyle({
                       transform: expanded.value ? "rotate(180deg)" : "rotate(0deg)",
                       transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)"
@@ -379,7 +382,7 @@ const SelectionActions = createComponent<SelectionActionsProps>("SelectionAction
                   transform: hasPrompt.value ? "scale(1)" : "scale(0.88)",
                   transitionTimingFunction: "cubic-bezier(0.23,1,0.32,1)"
                 })}>
-                  <button type="button" aria-label="Send edit instruction" onClick={() => run(prompt.value.trim())} class="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-surface transition-[opacity,transform] duration-200 active:scale-[0.94]">
+                  <button type="button" aria-label={t("selectionActions.sendEditInstruction")} onClick={() => run(prompt.value.trim())} class="flex size-7 shrink-0 items-center justify-center rounded-full bg-ink text-surface transition-[opacity,transform] duration-200 active:scale-[0.94]">
                     {icons.send}
                   </button>
                 </div>

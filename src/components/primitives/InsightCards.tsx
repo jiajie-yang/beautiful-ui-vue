@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -80,7 +81,7 @@ const Entity = createComponent<{
   return () => {
     return <span class="inline-flex items-center gap-1 align-baseline font-medium text-ink">
       <span class={`inline-block size-2.5 rounded-full ${tone.value}`} />
-      @{name.value}
+      {"@"}{name.value}
     </span>;
   };
 });
@@ -130,8 +131,9 @@ export type CompareSeries = {
   color: string;
   tooltipColor: string;
 };
-const COMPARE_SERIES: CompareSeries[] = [{
+const COMPARE_SERIES: (CompareSeries & { displayName: string })[] = [{
   name: "Mint Chip",
+  get displayName() { return t("common.mintChip"); },
   values: [-2.9, -3.4, -3.05, -3.86, -3.52, -4.1, -3.82, -4.41],
   sub: "-$2,377.66",
   tone: "red",
@@ -140,6 +142,7 @@ const COMPARE_SERIES: CompareSeries[] = [{
   tooltipColor: "var(--orange)"
 }, {
   name: "Pistachio",
+  get displayName() { return t("common.pistachio"); },
   values: [0.22, 0.58, 0.42, 0.91, 0.76, 1.08, 0.96, 1.15],
   sub: "+$617.22",
   tone: "green",
@@ -170,7 +173,7 @@ const CompareCard = createComponent<{
         {series.value.map((s, i) => <div key={s.name} class="flex-1">
             <span class="flex items-center gap-1.5 text-[11.5px] text-ink-2">
               <span class={`size-2 rounded-full ${s.dot}`} />
-              {s.name}
+              {__props.series === undefined ? COMPARE_SERIES.find(item => item.name === s.name)?.displayName ?? s.name : s.name}
             </span>
             <span class={`block text-[17px] font-semibold tracking-[-0.01em] tabular-nums ${s.tone === "red" ? "text-red" : "text-green"}`}>
               {formatPercent(points.value[i].at(-1)?.value ?? s.values.at(-1) ?? 0)}
@@ -181,11 +184,9 @@ const CompareCard = createComponent<{
       <div class="mt-2 overflow-hidden rounded-control bg-inset shadow-hairline">
         <div class="flex items-center justify-between border-b border-line px-2.5 py-1.5">
           <span class="text-[11px] text-ink-3 tabular-nums">
-            Trend snapshot
-          </span>
+            {t("insightCards.trendSnapshot")}</span>
           <span class="rounded-full bg-field px-2 py-0.5 text-[10.5px] font-medium text-ink-2">
-            Snapshot
-          </span>
+            {t("insightCards.snapshot")}</span>
         </div>
         <div class="insight-chart-stage relative h-[166px]" onPointerdown={event => setHoverIndex(chartIndexFromPointer(event, pointCount.value))} onPointermove={event => setHoverIndex(chartIndexFromPointer(event, pointCount.value))} onPointerleave={() => setHoverIndex(null)} onPointercancel={() => setHoverIndex(null)} onPointerup={() => setHoverIndex(null)}>
           <Liveline data={[]} value={0} series={chartSeries.value} theme={dark.value ? "dark" : "light"} grid={false} pulse={false} window={42} paused scrub={false} cursor="default" lineWidth={2.25} padding={{
@@ -242,20 +243,18 @@ const AnomalyCard = createComponent<{
       <div class="flex items-center justify-between">
         <span class="flex items-center gap-1.5 text-[12px] font-medium text-ink">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7" /></svg>
-          High freezer spend
-        </span>
+          {t("insightCards.highFreezerSpend")}</span>
         <span class="rounded-full bg-field px-2 py-0.5 text-[10.5px] font-medium text-ink-2">
-          Snapshot
-        </span>
+          {t("insightCards.snapshot")}</span>
       </div>
       <div class="mt-2 overflow-hidden rounded-control bg-inset shadow-hairline">
         <div class="flex items-center justify-between border-b border-line px-2.5 py-1.5">
           <span class="text-[11px] text-ink-3 tabular-nums">
-            {hoverIndex.value! !== null ? metric.value === "spend" ? formatMoney(data.value[hoverIndex.value!].value) : `${Math.round(data.value[hoverIndex.value!].value)} kWh` : `${threshold.value} threshold`}
+            {hoverIndex.value !== null ? metric.value === "spend" ? formatMoney(data.value[hoverIndex.value].value) : `${Math.round(data.value[hoverIndex.value].value)} kWh` : t("insightCards.label0Threshold", [threshold.value])}
           </span>
           <span class="flex rounded-full bg-field p-0.5">
             {(["spend", "usage"] as const).map(item => <button key={item} type="button" aria-pressed={metric.value === item} onClick={() => setMetric(item)} class={`rounded-full px-2 py-0.5 text-[10.5px] font-medium transition-[background-color,color,box-shadow,transform] duration-150 active:scale-[0.96] ${metric.value === item ? "bg-surface text-ink shadow-btn" : "text-ink-3 hover:text-ink-2"}`}>
-                {item === "spend" ? "Spend" : "Usage"}
+                {item === "spend" ? t("insightCards.spend") : t("insightCards.usage")}
               </button>)}
           </span>
         </div>
@@ -274,7 +273,7 @@ const AnomalyCard = createComponent<{
               left: `${Math.min(Math.max(hoverIndex.value! / (data.value.length - 1) * 100, 28), 72)}%`
             })}>
               <ChartTooltip rows={[{
-                label: metric.value === "spend" ? "Spend" : "Usage",
+                label: metric.value === "spend" ? t("insightCards.spend") : t("insightCards.usage"),
                 value: metric.value === "spend" ? formatMoney(data.value[hoverIndex.value!].value) : `${Math.round(data.value[hoverIndex.value!].value)} kWh`,
                 color: "var(--red)"
               }]} />
@@ -284,10 +283,9 @@ const AnomalyCard = createComponent<{
       </div>
       <div class="mt-1.5 flex items-baseline gap-2">
         <span class="text-[17px] font-semibold tracking-[-0.01em] text-ink tabular-nums">
-          {moneyLabel.value} spent
-        </span>
-        <Mono tone="red">+$1,834.66</Mono>
-        <span class="text-[11px] text-ink-3">vs 3 months</span>
+          {moneyLabel.value}{(" " + t("insightCards.spent"))}</span>
+        <Mono tone="red">{"+$1,834.66"}</Mono>
+        <span class="text-[11px] text-ink-3">{t("insightCards.vs3Months")}</span>
       </div>
     </div>;
   };
@@ -303,21 +301,21 @@ export type AllocationSegment = {
 };
 const ALLOCATION_SEGMENTS: AllocationSegment[] = [{
   name: "VAN",
-  label: "Vanilla",
+  get label() { return t("insightCards.vanilla"); },
   pct: 72.5,
   amount: "$51,785",
   cls: "bg-orange",
   tone: "text-orange"
 }, {
   name: "CHOC",
-  label: "Chocolate",
+  get label() { return t("insightCards.chocolate"); },
   pct: 22.8,
   amount: "$16,278",
   cls: "bg-line-strong",
   tone: "text-ink-2"
 }, {
   name: "MINT",
-  label: "Mint",
+  get label() { return t("insightCards.mint"); },
   pct: 4.7,
   amount: "$3,357",
   cls: "bg-line",
@@ -335,14 +333,12 @@ const AllocationCard = createComponent<{
     return <div class="min-h-[278px] rounded-card bg-surface p-3 shadow-hairline">
       <span class="flex items-center gap-1.5 text-[12px] font-medium text-ink">
         <span class="flex size-3.5 items-center justify-center rounded-full bg-orange text-[8px] font-bold text-white">
-          V
-        </span>
-        Vanilla allocation
-      </span>
+          {"V"}</span>
+        {t("insightCards.vanillaAllocation")}</span>
       <span class="mt-1 block text-[20px] font-semibold tracking-[-0.01em] text-ink tabular-nums">
         {active.value.amount}
       </span>
-      <div class="mt-3 flex h-9 gap-0.5 overflow-hidden rounded-full bg-field p-0.5" role="group" aria-label="Allocation segments">
+      <div class="mt-3 flex h-9 gap-0.5 overflow-hidden rounded-full bg-field p-0.5" role="group" aria-label={t("insightCards.allocationSegments")}>
         {segments.value.map(s => <button key={s.name} type="button" aria-pressed={selected.value === s.name} aria-label={`${s.label}: ${s.pct}%`} onClick={() => setSelected(s.name)} class={`relative h-full overflow-hidden rounded-full ${s.cls} transition-[opacity,transform,box-shadow] duration-300 active:scale-[0.98]`} style={cssStyle({
           width: `${s.pct}%`,
           opacity: selected.value === s.name ? 1 : 0.58,
@@ -359,14 +355,13 @@ const AllocationCard = createComponent<{
       <div class="mt-2 flex items-center gap-1.5">
         {segments.value.map(s => <button key={s.name} type="button" aria-pressed={selected.value === s.name} onClick={() => setSelected(s.name)} class={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] transition-[background-color,color,transform] duration-150 active:scale-[0.96] ${selected.value === s.name ? "bg-field text-ink" : "text-ink-2 hover:bg-hover hover:text-ink"}`}>
             <span class={`size-1.5 rounded-full ${s.cls}`} />
-            {s.name} <span class="tabular-nums">{s.pct}%</span>
+            {s.name} <span class="tabular-nums">{s.pct}{"%"}</span>
           </button>)}
       </div>
       <div class="mt-3 min-h-16 rounded-control bg-inset px-2.5 py-2 shadow-hairline">
         <span class={`block text-[11.5px] font-medium ${active.value.tone}`}>{active.value.label}</span>
         <span class="mt-1 block text-[11px] leading-relaxed text-ink-3">
-          Contribution snapshot across current inventory value. Segment selection changes the inspected group without moving the card.
-        </span>
+          {t("insightCards.contributionSnapshotAcrossCurrentInventoryValueSegmentSelectionChanges")}</span>
       </div>
     </div>;
   };
@@ -378,44 +373,40 @@ export type InsightPage = {
   Card: UI.ComponentType;
   pill: string;
 };
-const PAGES: InsightPage[] = [{
+function defaultPages(): InsightPage[] { return [{
   key: "compare",
   prose: <>
-        The worst performer in your <Entity name="Creamery" tone="bg-orange" /> is
-        Rocky Road — down <Mono tone="red">-6%</Mono> or <Mono tone="red">-$2,453.44</Mono>.
-      </>,
+        {(t("insightCards.theWorstPerformerInYour") + " ")}<Entity name={t("insightCards.creamery")} tone="bg-orange" />{(" " + t("insightCards.isRockyRoadDown") + " ")}<Mono tone="red">{"-6%"}</Mono>{(" " + t("insightCards.or") + " ")}<Mono tone="red">{"-$2,453.44"}</Mono>{"."}</>,
   Card: CompareCard,
-  pill: "Should I rebalance flavors?"
+  get pill() { return t("insightCards.shouldIRebalanceFlavors"); }
 }, {
   key: "anomaly",
   prose: <>
-        Unusually high freezer bill on <span class="font-medium text-ink">Dec 13</span> —{" "}
-        <Mono tone="red">+$1,834.66</Mono> above your average.
-      </>,
+        {(t("insightCards.unusuallyHighFreezerBillOn") + " ")}<span class="font-medium text-ink">{t("insightCards.dec13")}</span> {" —"}{" "}
+        <Mono tone="red">{"+$1,834.66"}</Mono>{(" " + t("insightCards.aboveYourAverage"))}</>,
   Card: AnomalyCard,
-  pill: "Get tips on cutting freezer costs"
+  get pill() { return t("insightCards.getTipsOnCuttingFreezerCosts"); }
 }, {
   key: "allocation",
   prose: <>
-        You’re heavily invested in <Entity name="Vanilla" tone="bg-orange" /> — it’s{" "}
-        <span class="font-medium text-ink">72.5%</span> of your case.
-      </>,
+        {(t("insightCards.youReHeavilyInvestedIn") + " ")}<Entity name={t("insightCards.vanilla")} tone="bg-orange" />{(" " + t("insightCards.itS"))}{" "}
+        <span class="font-medium text-ink">{"72.5%"}</span>{(" " + t("insightCards.ofYourCase"))}</>,
   Card: AllocationCard,
-  pill: "If we look at seasonals, what changes?"
-}];
+  get pill() { return t("insightCards.ifWeLookAtSeasonalsWhatChanges"); }
+}]; }
 export type InsightCardsLabels = {
   /** carousel heading shown before the page count */
   title: string;
 };
 const DEFAULT_INSIGHT_LABELS: InsightCardsLabels = {
-  title: "Insights"
+  get title() { return t("insightCards.insights"); }
 };
 const InsightCards = createComponent<{
   variant?: string;
   pages?: InsightPage[];
   labels?: Partial<InsightCardsLabels>;
 }>("InsightCards", ["variant", "pages", "labels"], (__props, __slots) => {
-  const pages = computed(() => __props.pages === undefined ? PAGES : __props.pages);
+  const pages = computed(() => __props.pages === undefined ? defaultPages() : __props.pages);
   const labels = computed(() => __props.labels);
   const l = computed(() => ({
     ...DEFAULT_INSIGHT_LABELS,
@@ -437,7 +428,7 @@ const InsightCards = createComponent<{
           <span class="text-[13px] text-ink-3 tabular-nums">{pages.value.length}</span>
         </span>
         <span class="flex items-center gap-0.5">
-          {(["M15 18l-6-6 6-6", "M9 6l6 6-6 6"] as const).map((d, i) => <button key={i} aria-label={i === 0 ? "Previous insight" : "Next insight"} onClick={() => move(i === 0 ? -1 : 1)} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
+          {(["M15 18l-6-6 6-6", "M9 6l6 6-6 6"] as const).map((d, i) => <button key={i} aria-label={i === 0 ? t("insightCards.previousInsight") : t("insightCards.nextInsight")} onClick={() => move(i === 0 ? -1 : 1)} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
                 transition-[background-color,color,transform] duration-100 hover:bg-hover
                 hover:text-ink active:scale-[0.96]">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

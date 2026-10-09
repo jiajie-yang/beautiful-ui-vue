@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -27,7 +28,7 @@ export const Liveline = createComponent<LivelineProps>("Liveline", ["data", "val
   const scrub = computed(() => __props.scrub === undefined ? true : __props.scrub);
   const loading = computed(() => __props.loading === undefined ? false : __props.loading);
   const paused = computed(() => __props.paused === undefined ? false : __props.paused);
-  const emptyText = computed(() => __props.emptyText);
+  const emptyText = computed(() => __props.emptyText ?? t("common.noDataToDisplay"));
   const exaggerate = computed(() => __props.exaggerate === undefined ? false : __props.exaggerate);
   const degenProp = computed(() => __props.degen);
   const badgeTail = computed(() => __props.badgeTail === undefined ? true : __props.badgeTail);

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -65,7 +66,7 @@ const ScrubField = createComponent<{
       <input inputmode="numeric" value={value.value} onInput={e => {
         const n = Number((e.target as HTMLInputElement).value.replace(/[^\d-]/g, ""));
         if (!Number.isNaN(n)) onChange.value(clamp(n));
-      }} aria-label={`${label.value} value`} class="min-w-0 flex-1 bg-transparent text-[12px] text-ink tabular-nums outline-none" />
+      }} aria-label={t("fineTuneCard.label0Value", [label.value])} class="min-w-0 flex-1 bg-transparent text-[12px] text-ink tabular-nums outline-none" />
       {suffix.value && <span class="shrink-0 pr-0.5 text-[11.5px] text-ink-3">{suffix.value}</span>}
     </label>;
   };
@@ -111,25 +112,25 @@ export type FineTuneState = {
 };
 const FIELDS: FineTuneField[] = [{
   key: "width",
-  label: "W",
+  get label() { return t("fineTuneCard.width"); },
   value: 324,
   min: 40,
   max: 999
 }, {
   key: "height",
-  label: "H",
+  get label() { return t("fineTuneCard.height"); },
   value: 96,
   min: 24,
   max: 999
 }, {
   key: "radius",
-  label: "Radius",
+  get label() { return t("fineTuneCard.radius"); },
   value: 28,
   min: 0,
   max: 64
 }, {
   key: "opacity",
-  label: "Opacity",
+  get label() { return t("fineTuneCard.opacity"); },
   value: 100,
   min: 0,
   max: 100,
@@ -137,12 +138,12 @@ const FIELDS: FineTuneField[] = [{
 }];
 const OPTIONS = ["Seasonal", "Classic", "Limited"];
 const DEFAULT_LABELS: FineTuneCardLabels = {
-  title: "Flavor card",
-  layout: "Layout",
-  type: "Type",
-  placeholder: "Select type",
-  adjust: "Adjust",
-  edited: "Edited"
+  get title() { return t("fineTuneCard.flavorCard"); },
+  get layout() { return t("fineTuneCard.layout"); },
+  get type() { return t("common.type"); },
+  get placeholder() { return t("fineTuneCard.selectType"); },
+  get adjust() { return t("fineTuneCard.adjust"); },
+  get edited() { return t("fineTuneCard.edited"); }
 };
 function chunk<T>(items: T[], size: number): T[][] {
   const rows: T[][] = [];
@@ -173,13 +174,14 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
   const [seg, setSeg] = createState(0);
   const [values, setValues] = createState<Record<string, number>>(() => Object.fromEntries(fields.value.map(f => [f.key, f.value])));
   const [menuOpen, setMenuOpen] = createState(false);
-  const [typeValue, setTypeValue] = createState(text.value.placeholder);
+  const [typeValue, setTypeValue] = createState<string | null>(null);
+  const typeLabel = (value: string | null) => value === null ? text.value.placeholder : (__props.options === undefined ? ({ Seasonal: t("common.seasonal"), Classic: t("common.classic"), Limited: t("fineTuneCard.limited") } as Record<string, string>)[value] ?? value : value);
   const selectSeg = (i: number) => {
     setSeg(i);
     onChange.value?.({
       segment: i,
       values: values.value,
-      type: typeValue.value
+      type: typeValue.value ?? text.value.placeholder
     });
   };
   const setValue = (key: string, v: number) => {
@@ -191,7 +193,7 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
       onChange.value?.({
         segment: seg.value,
         values: next,
-        type: typeValue.value
+        type: typeValue.value ?? text.value.placeholder
       });
       return next;
     });
@@ -206,7 +208,7 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
     });
   };
   const changed = computed(() => fields.value.some(f => values.value[f.key] !== f.value));
-  const done = computed(() => seg.value !== 0 || changed.value || typeValue.value !== text.value.placeholder);
+  const done = computed(() => seg.value !== 0 || changed.value || typeValue.value !== null);
   return () => {
     return <div class="relative w-full max-w-60 rounded-card bg-surface shadow-raised">
       {/* header */}
@@ -246,7 +248,7 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
             transform: `translateX(${seg.value * 100}%)`,
             transitionTimingFunction: "cubic-bezier(0.23, 1, 0.32, 1)"
           })} />
-          {SEGMENTS.map((s, i) => <button key={s} type="button" aria-label={`${s} layout`} aria-pressed={i === seg.value} onClick={() => selectSeg(i)} class={`relative z-10 flex h-6 items-center justify-center transition-colors duration-200
+          {SEGMENTS.map((s, i) => <button key={s} type="button" aria-label={t("fineTuneCard.label0Layout", [({ row: t("fineTuneCard.row"), col: t("fineTuneCard.col"), grid: t("common.grid") })[s]])} aria-pressed={i === seg.value} onClick={() => selectSeg(i)} class={`relative z-10 flex h-6 items-center justify-center transition-colors duration-200
                 ${i === seg.value ? "text-accent" : "text-ink-3"}`}>
               <SegmentIcon kind={s} />
             </button>)}
@@ -264,8 +266,8 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
               shadow-hairline transition-shadow duration-200 focus-visible:outline-none" style={cssStyle({
             boxShadow: menuOpen.value ? "0 0 0 1px var(--accent)" : undefined
           })}>
-            <span class={`text-[12px] ${typeValue.value !== text.value.placeholder ? "text-ink" : "text-ink-3"}`}>
-              {typeValue.value}
+            <span class={`text-[12px] ${typeValue.value !== null ? "text-ink" : "text-ink-3"}`}>
+              {typeLabel(typeValue.value)}
             </span>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200" style={cssStyle({
               transform: menuOpen.value ? "rotate(180deg)" : "rotate(0)"
@@ -279,8 +281,8 @@ const FineTuneCard = createComponent<FineTuneCardProps>("FineTuneCard", ["varian
             transformOrigin: "bottom right"
           })}>
               <GlideMenu className="flex flex-col gap-px" highlightClassName="inset-x-0 rounded-[6px] bg-field">
-                {options.value.map(item => <button key={item} data-menu-row type="button" onClick={() => selectType(item)} class={`relative z-10 flex h-6.5 w-full items-center rounded-[6px] px-2 text-left text-[12.5px] text-ink ${item === typeValue.value ? "bg-field group-hover/glide-menu:bg-transparent" : ""}`}>
-                    {item}
+                {options.value.map(item => <button key={typeLabel(item)} data-menu-row type="button" onClick={() => selectType(item)} class={`relative z-10 flex h-6.5 w-full items-center rounded-[6px] px-2 text-left text-[12.5px] text-ink ${item === typeValue.value ? "bg-field group-hover/glide-menu:bg-transparent" : ""}`}>
+                    {typeLabel(item)}
                   </button>)}
               </GlideMenu>
             </div>}

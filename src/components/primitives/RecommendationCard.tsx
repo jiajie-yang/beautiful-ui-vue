@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -30,47 +31,45 @@ export type RecommendationLabels = {
   accepted: string;
 };
 const DEFAULT_LABELS: RecommendationLabels = {
-  title: "Want me to place this restock order?",
-  alternatives: "Alternatives",
-  otherOptions: "Other options",
-  accepted: "Accepted"
+  get title() { return t("recommendationCard.wantMeToPlaceThisRestockOrder"); },
+  get alternatives() { return t("common.alternatives"); },
+  get otherOptions() { return t("recommendationCard.otherOptions"); },
+  get accepted() { return t("recommendationCard.accepted"); }
 };
-const OPTIONS: RecommendationOption[] = [{
+function defaultOptions(): RecommendationOption[] { return [{
   key: "high",
   body: <>
-        Reorder waffle cones from{" "}
+        {t("recommendationCard.reorderWaffleConesFrom")}{" "}
         <EntityChip name="Cone King" />{" "}
-        with lead time <ValuePill tone="green">7 days</ValuePill>
+        {(t("recommendationCard.withLeadTime") + " ")}<ValuePill tone="green">{t("recommendationCard.label7Days")}</ValuePill>
       </>,
-  short: "Reorder from Cone King · 7-day lead",
+  get short() { return t("recommendationCard.reorderFromConeKing7DayLead"); },
   signal: 3,
   tone: "var(--green)",
-  label: "High confidence",
-  cta: "Accept",
+  get label() { return t("recommendationCard.highConfidence"); },
+  get cta() { return t("common.accept"); },
   ctaVariant: "accent"
 }, {
   key: "review",
   body: <>
-        Switch vanilla to <ValuePill>Vanilla Madagascar</ValuePill> for peak season.
-      </>,
-  short: "Switch to Vanilla Madagascar",
+        {t("recommendationCard.switchVanillaTo") + " "}<ValuePill>{t("recommendationCard.vanillaMadagascar")}</ValuePill>{(" " + t("recommendationCard.forPeakSeason"))}</>,
+  get short() { return t("recommendationCard.switchToVanillaMadagascar"); },
   signal: 2,
   tone: "var(--orange)",
-  label: "Needs review",
-  cta: "Configure",
+  get label() { return t("common.needsReview"); },
+  get cta() { return t("common.configure"); },
   ctaVariant: "primary"
 }, {
   key: "none",
   body: <>
-        Fall back to a <span class="font-medium text-ink">full restock</span> across every SKU.
-      </>,
-  short: "Full restock across every SKU",
+        {(t("recommendationCard.fallBackToA") + " ")}<span class="font-medium text-ink">{t("recommendationCard.fullRestock")}</span>{(" " + t("recommendationCard.acrossEverySku"))}</>,
+  get short() { return t("recommendationCard.fullRestockAcrossEverySku"); },
   signal: 0,
   tone: "var(--ink-3)",
-  label: "No signal",
-  cta: "Accept full restock",
+  get label() { return t("recommendationCard.noSignal"); },
+  get cta() { return t("recommendationCard.acceptFullRestock"); },
   ctaVariant: "primary"
-}];
+}]; }
 const Meter = createComponent<{
   signal: number;
   tone: string;
@@ -91,7 +90,7 @@ const RecommendationCard = createComponent<{
   labels?: Partial<RecommendationLabels>;
   variant?: string;
 }>("RecommendationCard", ["options", "labels", "variant"], (__props, __slots) => {
-  const options = computed(() => __props.options === undefined ? OPTIONS : __props.options);
+  const options = computed(() => __props.options === undefined ? defaultOptions() : __props.options);
   const labels = computed(() => __props.labels);
   const t = computed(() => ({
     ...DEFAULT_LABELS,

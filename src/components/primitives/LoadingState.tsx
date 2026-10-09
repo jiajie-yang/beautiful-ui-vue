@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -78,8 +79,8 @@ function useElapsed() {
   }, () => []);
   const total = computed(() => ds.value / 10);
   return computed(() => {
-    if (total.value < 60) return `${total.value.toFixed(1)}s`;
-    return `${Math.floor(total.value / 60)}m ${(total.value % 60).toFixed(1)}s`;
+    if (total.value < 60) return t("loadingState.label0S", [total.value.toFixed(1)]);
+    return t("loadingState.label0M1S", [Math.floor(total.value / 60), (total.value % 60).toFixed(1)]);
   });
 }
 const LoadingState = createComponent<{
@@ -92,7 +93,7 @@ const LoadingState = createComponent<{
   const videoSrc = computed(() => __props.videoSrc === undefined ? "https://95dnc2a95qgwt9ff.public.blob.vercel-storage.com/subway-surfers-min.mp4" : __props.videoSrc);
   const elapsed = useElapsed();
   const surfer = computed(() => variant.value === "Surfer");
-  const resolvedLabel = computed(() => label.value ?? (surfer.value ? "Subway surfing" : "Churning"));
+  const resolvedLabel = computed(() => label.value ?? (surfer.value ? t("common.subwaySurfing") : t("loadingState.churning")));
   const [videoOk, setVideoOk] = createState(true);
   const delays = computed(() => (PATTERNS[variant.value] ?? PATTERNS.Drive).delays),
     dur = computed(() => (PATTERNS[variant.value] ?? PATTERNS.Drive).dur),
@@ -127,8 +128,7 @@ const LoadingState = createComponent<{
                 <span class="px-3 text-center font-mono text-[10px]" style={cssStyle({
                 color: "var(--tooltip-muted)"
               })}>
-                  Video unavailable
-                </span>
+                  {t("loadingState.videoUnavailable")}</span>
               </div>}
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -39,8 +40,8 @@ export const Nav = createComponent<Record<string, never>>("Nav", [], (__props, _
     });
   }, () => [hovered.value, active.value]);
   return () => {
-    return <nav aria-label="Components">
-      <p class="mb-2 text-[11.5px] text-ink-3">Components</p>
+    return <nav aria-label={t("common.components")}>
+      <p class="mb-2 text-[11.5px] text-ink-3">{t("common.components")}</p>
       <ul ref={listRef} onMouseleave={() => setHovered(null)} class="relative flex flex-col">
         {/* single gliding highlight */}
         <span aria-hidden class="pointer-events-none absolute inset-x-0 rounded-[7px] bg-hover" style={cssStyle({

@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -62,6 +63,7 @@ const BRANDS: Record<string, UI.VNodeChild> = {
 type Source = {
   key: string;
   name: string;
+  searchText?: string;
   desc: string;
   glyph?: string;
   brand?: string;
@@ -70,78 +72,81 @@ type Source = {
 };
 const SOURCES: Source[] = [{
   key: "attach",
-  name: "Add photos & files",
-  desc: "Upload from your computer",
+  get name() { return t("promptBar.addPhotosFiles"); },
+  get searchText() { return t("promptBar.addPhotosFiles", {}, { locale: "en" }); },
+  get desc() { return t("promptBar.uploadFromYourComputer"); },
   glyph: "clip",
   attach: true
 }, {
   key: "scoop",
   name: "Scoop Data",
-  desc: "Sales & churn metrics",
+  get desc() { return t("promptBar.salesChurnMetrics"); },
   glyph: "chart"
 }, {
   key: "flavors",
-  name: "Flavor records",
-  desc: "26 makers, tags, links",
+  get name() { return t("promptBar.flavorRecords"); },
+  get searchText() { return t("promptBar.flavorRecords", {}, { locale: "en" }); },
+  get desc() { return t("promptBar.label26MakersTagsLinks"); },
   glyph: "layers"
 }, {
   key: "web",
-  name: "Web search",
-  desc: "Real-time news and info",
+  get name() { return t("common.webSearch"); },
+  get searchText() { return t("common.webSearch", {}, { locale: "en" }); },
+  get desc() { return t("promptBar.realTimeNewsAndInfo"); },
   glyph: "globe"
 }, {
   key: "figma",
   name: "Figma",
-  desc: "Design-to-code workflows",
+  get desc() { return t("promptBar.designToCodeWorkflows"); },
   brand: "figma"
 }, {
   key: "slack",
   name: "Slack",
-  desc: "Read and manage Slack",
+  get desc() { return t("promptBar.readAndManageSlack"); },
   brand: "slack"
 }, {
   key: "gmail",
   name: "Gmail",
-  desc: "Read and manage Gmail",
+  get desc() { return t("promptBar.readAndManageGmail"); },
   brand: "gmail",
   connect: true
 }];
 const COMMANDS = [{
   key: "compare",
   name: "/compare",
-  desc: "Flavor vs. last summer"
+  get desc() { return t("promptBar.flavorVsLastSummer"); }
 }, {
   key: "churn-plan",
   name: "/churn-plan",
-  desc: "Draft a churn schedule"
+  get desc() { return t("promptBar.draftAChurnSchedule"); }
 }, {
   key: "restock",
   name: "/restock",
-  desc: "Build a reorder list"
+  get desc() { return t("promptBar.buildAReorderList"); }
 }, {
   key: "draft-email",
   name: "/draft-email",
-  desc: "Write a supplier email"
+  get desc() { return t("promptBar.writeASupplierEmail"); }
 }, {
   key: "summarize",
   name: "/summarize",
-  desc: "Digest the thread so far"
+  get desc() { return t("promptBar.digestTheThreadSoFar"); }
 }];
 const MODELS = [{
   key: "sprinkles-5",
   name: "Sprinkles 5",
-  tag: "Flagship"
+  get tag() { return t("promptBar.flagship"); }
 }, {
   key: "vanilla-1",
   name: "Vanilla 1",
-  tag: "Basic"
+  get tag() { return t("promptBar.basic"); }
 }, {
   key: "freezer-burn",
   name: "Freezer Burn 0.4",
-  tag: "Stale"
+  get tag() { return t("promptBar.stale"); }
 }];
 const FILES = ["flavor-chart.png", "summer-menu.pdf", "pos-export.csv"];
-const DICTATION = "Compare pistachio weekends to last summer";
+function dictation() { return t("promptBar.comparePistachioWeekendsToLastSummer"); }
 
 /* self-running demo: walk the @ menu, then the / menu, and repeat.
  * Any pointer or key interaction hands control to the user. */
@@ -217,7 +222,7 @@ function parseToken(draft: string): {
   query: string;
   start: number;
 } | null {
-  const match = /(^|\s)([@/])([\w-]*)$/.exec(draft);
+  const match = /(^|\s)([@/])([\p{L}\p{N}_-]*)$/u.exec(draft);
   if (!match) return null;
   return {
     kind: match[2] === "@" ? "at" : "slash",
@@ -292,7 +297,7 @@ const PromptBar = createComponent<{
     key: string;
     name: string;
     desc: string;
-  }[]> = computed(() => menu.value === "at" ? SOURCES.filter(s => s.name.toLowerCase().includes(query.value)) : menu.value === "slash" ? COMMANDS.filter(c => c.name.slice(1).startsWith(query.value)) : []);
+  }[]> = computed(() => menu.value === "at" ? SOURCES.filter(s => (s.name.toLowerCase().includes(query.value) || s.searchText?.toLowerCase().includes(query.value))) : menu.value === "slash" ? COMMANDS.filter(c => c.name.slice(1).startsWith(query.value)) : []);
   watchLifecycle(() => {
     setActive(0);
     setEngaged(false);
@@ -416,7 +421,7 @@ const PromptBar = createComponent<{
   watchLifecycle(() => {
     if (!listening.value) return;
     const t = setTimeout(() => {
-      setDraft(current => current ? `${current.trimEnd()} ${DICTATION}` : DICTATION);
+      setDraft(current => current ? `${current.trimEnd()} ${dictation()}` : dictation());
       setListening(false);
       inputRef.value?.focus();
     }, 2200);
@@ -521,15 +526,14 @@ const PromptBar = createComponent<{
                 event.stopPropagation();
                 setConnected(current => !current);
               }} class={`shrink-0 text-[12px] font-medium transition-colors duration-100 ${connected.value ? "text-green" : "text-accent-ink hover:underline"}`}>
-                    {connected.value ? "Connected" : "Connect"}
+                    {connected.value ? t("promptBar.connected") : t("promptBar.connect")}
                   </span>}
               </button>;
           })}
           {rows.value.length === 0 && <div class="flex h-9 items-center px-2 text-[12px] text-ink-3">
-              No matches for “{query.value}”
-            </div>}
+              {t("promptBar.noMatchesFor")}{query.value}{"”"}</div>}
           <div class="mt-1 border-t border-line px-2 pt-1.5 pb-1 text-[11px] text-ink-3">
-            {menu.value === "at" ? "Type to search sources & files" : "Type to search commands"}
+            {menu.value === "at" ? t("promptBar.typeToSearchSourcesFiles") : t("promptBar.typeToSearchCommands")}
           </div>
         </div>}
 
@@ -579,14 +583,14 @@ const PromptBar = createComponent<{
             })}>
                 <Icon size={12}><g><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /></g></Icon>
                 <span class="max-w-36 truncate">{file}</span>
-                <button type="button" aria-label={`Remove ${file}`} onClick={() => setAttachments(current => current.filter((_, j) => j !== i))} class={`-my-1 flex size-6 items-center justify-center text-ink-3 transition-colors duration-100 hover:bg-line/70 hover:text-ink ${pill.value ? "rounded-full" : "rounded-[5px]"}`}>
+                <button type="button" aria-label={t("promptBar.remove0", [file])} onClick={() => setAttachments(current => current.filter((_, j) => j !== i))} class={`-my-1 flex size-6 items-center justify-center text-ink-3 transition-colors duration-100 hover:bg-line/70 hover:text-ink ${pill.value ? "rounded-full" : "rounded-[5px]"}`}>
                   <Icon size={10} strokeWidth={2.5}><path d="M18 6L6 18M6 6l12 12" /></Icon>
                 </button>
               </span>)}
           </div>}
 
         <div ref={controlsRef} class={`grid items-end gap-x-1 gap-y-1.5 ${wide.value ? "grid-cols-[28px_auto_minmax(0,1fr)_28px_28px]" : "grid-cols-[28px_minmax(0,1fr)_auto_28px_28px]"}`}>
-          <button type="button" aria-label="Add attachments and sources" aria-expanded={plusOpen.value} onClick={() => {
+          <button type="button" aria-label={t("promptBar.addAttachmentsAndSources")} aria-expanded={plusOpen.value} onClick={() => {
               setModelOpen(false);
               setPlusOpen(current => !current);
               inputRef.value?.focus();
@@ -599,6 +603,7 @@ const PromptBar = createComponent<{
               setDismissed(false);
               setPlusOpen(false);
             }} onKeydown={event => {
+              if (event.isComposing || event.keyCode === 229) return;
               if (menu.value && rows.value.length > 0) {
                 if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                   event.preventDefault();
@@ -621,10 +626,10 @@ const PromptBar = createComponent<{
                 event.preventDefault();
                 send();
               }
-            }} placeholder={listening.value ? "Listening…" : placeholder.value ?? "Write a message…"} aria-label="Prompt" class={`${tall.value ? "min-h-[68px] px-2 py-2 text-[14px] leading-5" : "min-h-7 px-1 py-[5px] text-[13px] leading-[18px]"} min-w-0 w-full resize-none bg-transparent text-ink outline-none [overflow-wrap:anywhere] placeholder:text-ink-3 ${wide.value ? "col-span-full col-start-1 row-start-1" : "col-start-2 row-start-1"}`} />
+            }} placeholder={listening.value ? t("promptBar.listening") : placeholder.value ?? t("promptBar.writeAMessage")} aria-label={t("promptBar.prompt")} class={`${tall.value ? "min-h-[68px] px-2 py-2 text-[14px] leading-5" : "min-h-7 px-1 py-[5px] text-[13px] leading-[18px]"} min-w-0 w-full resize-none bg-transparent text-ink outline-none [overflow-wrap:anywhere] placeholder:text-ink-3 ${wide.value ? "col-span-full col-start-1 row-start-1" : "col-start-2 row-start-1"}`} />
 
           {/* model picker */}
-          <button ref={modelRef} type="button" aria-expanded={modelOpen.value} aria-label="Choose model" onClick={() => {
+          <button ref={modelRef} type="button" aria-expanded={modelOpen.value} aria-label={t("promptBar.chooseModel")} onClick={() => {
               setPlusOpen(false);
               setModelOpen(current => !current);
             }} class={`flex h-7 shrink-0 items-center gap-1 px-1.5 text-[12px] font-medium text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink ${pill.value ? "rounded-full" : "rounded-[8px]"} ${wide.value ? "col-start-2 row-start-2 justify-self-start" : "col-start-3 row-start-1"}`}>
@@ -635,7 +640,7 @@ const PromptBar = createComponent<{
           </button>
 
           {/* dictation */}
-          <button type="button" aria-label={listening.value ? "Stop dictation" : "Start dictation"} aria-pressed={listening.value} onClick={() => setListening(current => !current)} class={`flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-150 active:scale-[0.94] ${pill.value ? "rounded-full" : "rounded-[8px]"} ${listening.value ? "bg-accent-tint text-accent-ink" : "text-ink-3 hover:bg-hover hover:text-ink"} ${wide.value ? "col-start-4 row-start-2" : "col-start-4 row-start-1"}`}>
+          <button type="button" aria-label={listening.value ? t("promptBar.stopDictation") : t("promptBar.startDictation")} aria-pressed={listening.value} onClick={() => setListening(current => !current)} class={`flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-150 active:scale-[0.94] ${pill.value ? "rounded-full" : "rounded-[8px]"} ${listening.value ? "bg-accent-tint text-accent-ink" : "text-ink-3 hover:bg-hover hover:text-ink"} ${wide.value ? "col-start-4 row-start-2" : "col-start-4 row-start-1"}`}>
             {listening.value ? <span class="flex h-3.5 items-center gap-[2.5px]">
                 {[0, 1, 2].map(i => <span key={i} class="w-[2.5px] rounded-full bg-current" style={cssStyle({
                   height: "100%",
@@ -645,7 +650,7 @@ const PromptBar = createComponent<{
           </button>
 
           {/* send — tactile square (round in the pill variant) */}
-          <button type="button" aria-label="Send" disabled={!canSend.value} onClick={send} class={`flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-200 enabled:active:scale-[0.94] ${pill.value ? "rounded-full" : "rounded-[8px]"} ${wide.value ? "col-start-5 row-start-2" : "col-start-5 row-start-1"}`} style={cssStyle({
+          <button type="button" aria-label={t("common.send")} disabled={!canSend.value} onClick={send} class={`flex size-7 shrink-0 items-center justify-center transition-[background-color,color,transform] duration-200 enabled:active:scale-[0.94] ${pill.value ? "rounded-full" : "rounded-[8px]"} ${wide.value ? "col-start-5 row-start-2" : "col-start-5 row-start-1"}`} style={cssStyle({
               background: canSend.value ? "var(--ink)" : "var(--line-strong)",
               color: canSend.value ? "var(--surface)" : "var(--ink-2)"
             })}>

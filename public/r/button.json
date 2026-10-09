@@ -39,7 +39,7 @@
       "path": "src/styles/site.css",
       "target": "~/src/styles/site.css",
       "type": "registry:style",
-      "content": "/* The upstream tokens are local copies; no parent repository is needed. */\n:root { --font-inter: 'Inter Variable'; --font-mono-face: 'JetBrains Mono Variable'; }\nbody { margin: 0; color: var(--ink); font-family: var(--font-inter), system-ui, sans-serif; }\na, button, summary { -webkit-tap-highlight-color: transparent; }\na.router-link-exact-active { color: var(--ink); }\n:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }\n"
+      "content": "/* The upstream tokens are local copies; no parent repository is needed. */\n:root { --font-inter: 'Inter Variable'; --font-mono-face: 'JetBrains Mono Variable'; }\nbody { margin: 0; color: var(--ink); font-family: var(--font-inter), system-ui, \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif; }\na, button, summary { -webkit-tap-highlight-color: transparent; }\na.router-link-exact-active { color: var(--ink); }\n:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }\n\nhtml[lang=\"zh-CN\"] { letter-spacing: 0; }\nhtml[lang=\"zh-CN\"] body { letter-spacing: 0; }\n"
     },
     {
       "path": "LICENSE.md",

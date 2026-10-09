@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -29,56 +30,56 @@ const FILTERS: {
   count: number;
 }[] = [{
   key: "all",
-  label: "All",
+  get label() { return t("filterTable.all"); },
   count: 5
 }, {
   key: "todo",
-  label: "To do",
+  get label() { return t("filterTable.toDo"); },
   dot: "#f09a2f",
   count: 2
 }, {
   key: "progress",
-  label: "In Progress",
+  get label() { return t("filterTable.inProgress"); },
   dot: "#16a6c7",
   count: 2
 }, {
   key: "done",
-  label: "Completed",
+  get label() { return t("common.completed"); },
   dot: "#25a878",
   count: 1
 }];
 const ROWS: TableRow[] = [{
-  task: "Restock mango sorbet",
-  date: "Dec 03",
+  get task() { return t("filterTable.restockMangoSorbet"); },
+  get date() { return t("filterTable.dec03"); },
   status: "todo",
   owner: "Mango Moon Gelato"
 }, {
-  task: "Churn black sesame",
-  date: "Sep 22",
+  get task() { return t("filterTable.churnBlackSesame"); },
+  get date() { return t("filterTable.sep22"); },
   status: "progress",
   owner: "Kumo Creamery"
 }, {
-  task: "Print summer menu",
-  date: "Jan 02",
+  get task() { return t("filterTable.printSummerMenu"); },
+  get date() { return t("filterTable.jan02"); },
   status: "todo",
   owner: "Coral Coast Sorbet"
 }, {
-  task: "Taste-test batch 42",
-  date: "Nov 08",
+  get task() { return t("filterTable.tasteTestBatch42"); },
+  get date() { return t("filterTable.nov08"); },
   status: "progress",
   owner: "Maple Orbit"
 }, {
-  task: "Order waffle cones",
-  date: "Apr 14",
+  get task() { return t("filterTable.orderWaffleCones"); },
+  get date() { return t("filterTable.apr14"); },
   status: "done",
   owner: "Aurora Scoops"
 }];
 const LABELS: FilterTableLabels = {
   columns: {
-    task: "Task name",
-    date: "Date",
-    status: "Status",
-    owner: "Advisor"
+    get task() { return t("filterTable.taskName"); },
+    get date() { return t("common.date"); },
+    get status() { return t("filterTable.status"); },
+    get owner() { return t("filterTable.advisor"); }
   }
 };
 const PILLS: Record<Status, {
@@ -86,15 +87,15 @@ const PILLS: Record<Status, {
   cls: string;
 }> = {
   todo: {
-    label: "To do",
+    get label() { return t("filterTable.toDo"); },
     cls: "filter-status-todo"
   },
   progress: {
-    label: "In Progress",
+    get label() { return t("filterTable.inProgress"); },
     cls: "filter-status-progress"
   },
   done: {
-    label: "Completed",
+    get label() { return t("common.completed"); },
     cls: "filter-status-done"
   }
 };
@@ -130,7 +131,7 @@ const FilterTable = createComponent<{
       </div>
 
       {/* table */}
-      <div aria-label="Scrollable task table" class="overflow-x-auto rounded-card bg-surface shadow-card" role="region" tabindex={0} style={cssStyle({
+      <div aria-label={t("filterTable.scrollableTaskTable")} class="overflow-x-auto rounded-card bg-surface shadow-card" role="region" tabindex={0} style={cssStyle({
         scrollbarWidth: "none"
       })}>
         <div class="min-w-[420px]">

@@ -4,7 +4,7 @@
 
 [Beautiful UI Vue](https://github.com/jiajie-yang/beautiful-ui-vue) is an independent project ported and rewritten from [Beautiful UI](https://github.com/slev12397/beautiful-ui) using Vue 3 + Vite + TypeScript + Tailwind CSS 4, preserving the original components, interactions, and visual design. Components use native Vue JSX, and the application shell uses Vue SFCs, without a React compatibility layer. The project has its own Git repository, dependencies, lockfile, and build configuration, and can be moved and deployed independently.
 
-This README is available in Chinese and English. The demo UI is primarily in English and does not yet provide language switching.
+This README is available in Chinese and English. The demo UI supports English and Simplified Chinese, with language switches on the gallery and Harness pages.
 
 ## Preview
 
@@ -117,3 +117,9 @@ The default address is `127.0.0.1:3000`. Set `HOST` to listen on another interfa
 See the [migration validation report](docs/MIGRATION_VALIDATION.md). Commercial Central Icons have been replaced with local SVGs that preserve dimensions and semantics, with some differences in glyph shapes. React Agentation has been replaced with a Vue development tool for selecting elements, entering feedback, and copying it, without Agentation's external service integration. Inter and JetBrains Mono are loaded locally through Fontsource; font versions may introduce minor rasterization differences compared with Google's hosted builds.
 
 This project maintains its own version history. It is not a submodule of the original project and has no runtime imports or symbolic links pointing to it. The original author's MIT copyright notice and third-party licenses are preserved. See [UPSTREAM.md](UPSTREAM.md) for sources and versions.
+
+## Interface language
+
+The gallery and `/harness` have an EN / 中文 switch. Locale follows the browser on first visit and persists locally afterward. Vue I18n 11 manages the shared Composition API instance, English fallback and interpolation. Registry items include `src/lib/i18n.ts`, `src/lib/locales` and the `vue-i18n` dependency; import `setLocale` from `@/lib/i18n` to select `en` or `zh-CN`. Component IDs and variant values remain stable; supplied labels, business data, user input, code and licenses are displayed literally. See [localization maintenance](docs/I18N.zh-CN.md) for stable keys, adding languages and the boundary between UI messages and supplied data.
+
+See [Chinese interface validation](docs/LOCALIZATION_VALIDATION.zh-CN.md) for coverage and limits.

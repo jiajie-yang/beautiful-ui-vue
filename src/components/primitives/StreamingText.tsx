@@ -1,6 +1,7 @@
+import { t, locale } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
-import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
+import { computed, watch, type ComputedRef, type FunctionalComponent } from 'vue';
 import { createComponent, createState, templateRef, watchLifecycle, cssStyle, omitProps, teleport } from '@/lib/vue-tools';
 /* ─────────────────────────────────────────────────────────
  * STREAMING TEXT
@@ -16,15 +17,11 @@ export type StreamingToken = {
   text: string;
   cite?: boolean;
 };
-const TOKENS: StreamingToken[] = [..."Pistachio is your fastest-growing flavor — sales are up 23% this month and margins beat vanilla by 8 points.".split(" ").map(text => ({
-  text
-})), {
-  text: "",
-  cite: true
-}, ..."Stone-fruit flavors are trending in the same range.".split(" ").map(text => ({
-  text
-}))];
-const FOLLOW_UPS = ["Which flavors sell best in winter", "Compare gelato and soft serve margins"];
+function defaultTokens(): StreamingToken[] {
+  const tokens = (text: string) => (locale.value.startsWith('zh') ? Array.from(text) : text.split(' ')).map(text => ({ text }))
+  return [...tokens(t("streamingText.pistachioIsYourFastestGrowingFlavorSalesAreUp")), { text: '', cite: true }, ...tokens(t("streamingText.stoneFruitFlavorsAreTrendingInTheSameRange"))]
+}
+function defaultFollowUps() { return [t("streamingText.whichFlavorsSellBestInWinter"), t("streamingText.compareGelatoAndSoftServeMargins")]; }
 const SOURCE_IMAGES = {
   scoop: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231f7a5f'/%3E%3Cpath d='M20 36c0 7 5.4 12 12 12s12-5 12-12H20Z' fill='%23fff'/%3E%3Ccircle cx='32' cy='25' r='11' fill='%23bff3dd'/%3E%3Cpath d='M24 24c4-7 13-7 17 0' fill='none' stroke='%231f7a5f' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E",
   trends: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f6fec'/%3E%3Cpath d='M15 43 27 31l8 7 14-18' fill='none' stroke='%23fff' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='49' cy='20' r='5' fill='%23bfe0ff'/%3E%3C/svg%3E",
@@ -68,7 +65,7 @@ const SourceChip = createComponent<{
         transition-colors duration-150 hover:bg-hover hover:text-ink" style={cssStyle({
       animation: "pop-in 250ms cubic-bezier(0.23,1,0.32,1) both"
     })}>
-      <img src={sourceImage(source.value)} alt="" class="source-avatar size-3 rounded-[3px]" />
+      <img src={sourceImage(source.value)} alt={""} class="source-avatar size-3 rounded-[3px]" />
       <span>{source.value.domain}</span>
     </a>;
   };
@@ -81,8 +78,8 @@ export type StreamingLabels = {
   followUps: string;
 };
 const DEFAULT_LABELS: StreamingLabels = {
-  sources: "10 sources",
-  followUps: "Follow-ups"
+  get sources() { return t("streamingText.label10Sources"); },
+  get followUps() { return t("streamingText.followUps"); }
 };
 const StreamingText = createComponent<{
   variant?: string;
@@ -102,9 +99,9 @@ const StreamingText = createComponent<{
   /** fired when a follow-up prompt is chosen */
   onFollowUp?: (text: string, index: number) => void;
 }>("StreamingText", ["variant", "content", "sources", "followUps", "labels", "loop", "fill", "onDone", "onFollowUp"], (__props, __slots) => {
-  const content = computed(() => __props.content === undefined ? TOKENS : __props.content);
+  const content = computed(() => __props.content === undefined ? defaultTokens() : __props.content);
   const sources = computed(() => __props.sources === undefined ? SOURCES : __props.sources);
-  const followUps = computed(() => __props.followUps === undefined ? FOLLOW_UPS : __props.followUps);
+  const followUps = computed(() => __props.followUps === undefined ? defaultFollowUps() : __props.followUps);
   const labels = computed(() => __props.labels);
   const loop = computed(() => __props.loop === undefined ? true : __props.loop);
   const fill = computed(() => __props.fill === undefined ? false : __props.fill);
@@ -116,13 +113,27 @@ const StreamingText = createComponent<{
   }));
   const [count, setCount] = createState(0);
   const [sourcesOpen, setSourcesOpen] = createState(false);
+  let completed = false;
+  // Switching language changes the default token count, not the stream cycle.
+  watch(content, (next, previous) => {
+    if (__props.content !== undefined) {
+      completed = false;
+      setCount(0);
+      return;
+    }
+    setCount(completed ? next.length : Math.min(next.length, Math.floor(count.value / Math.max(1, previous.length) * next.length)));
+  }, { flush: 'sync' });
   const done = computed(() => count.value >= content.value.length);
   watchLifecycle(() => {
     if (done.value && !loop.value) {
-      onDone.value?.();
+      if (!completed) { completed = true; onDone.value?.(); }
       return;
     }
-    const t = setTimeout(() => setCount(c => c >= content.value.length ? 0 : c + 1), done.value ? HOLD_MS : WORD_MS);
+    if (done.value) completed = true;
+    const t = setTimeout(() => {
+      if (count.value >= content.value.length) { completed = false; setCount(0); }
+      else setCount(c => c + 1);
+    }, done.value ? HOLD_MS : WORD_MS);
     return () => clearTimeout(t);
     
   }, () => [count.value, done.value, loop.value]);
@@ -130,8 +141,7 @@ const StreamingText = createComponent<{
     return <div class={fill.value ? "w-full" : "min-h-[15.5rem] w-full max-w-95"}>
       <p class="text-[13px] leading-relaxed text-ink">
         {content.value.slice(0, count.value).map((token, i) => token.cite ? <SourceChip key={i} source={sources.value[0]} /> : <span key={i} class="inline">
-              {token.text}{" "}
-            </span>)}
+              {token.text}{__props.content !== undefined || !locale.value.startsWith('zh') ? " " : ""}</span>)}
         {!done.value && <span class="ml-0.5 inline-block h-3 w-0.5 translate-y-0.5 rounded-full bg-ink" style={cssStyle({
           animation: "fade-in 150ms ease-out both"
         })} />}
@@ -142,7 +152,7 @@ const StreamingText = createComponent<{
         opacity: done.value ? 1 : 0,
         pointerEvents: done.value ? "auto" : "none"
       })}>
-        {ACTION_ICONS.map((icon, i) => <button key={i} type="button" aria-label="Action" class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
+        {ACTION_ICONS.map((icon, i) => <button key={i} type="button" aria-label={t("common.action")} class="flex size-6 items-center justify-center rounded-[6px] text-ink-3
               transition-colors duration-100 hover:bg-hover-2 hover:text-ink-2">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               {icon}
@@ -150,7 +160,7 @@ const StreamingText = createComponent<{
           </button>)}
         <button type="button" aria-expanded={sourcesOpen.value} onClick={() => setSourcesOpen(current => !current)} class="ml-1.5 flex items-center gap-1.5 rounded-[6px] px-1 py-0.5 text-left transition-colors duration-150 hover:bg-hover">
           <span class="flex -space-x-1">
-            {sources.value.map(source => <img key={source.domain} src={sourceImage(source)} alt="" class="source-avatar size-3.5 rounded-full bg-surface shadow-[0_0_0_1.5px_var(--canvas)]" />)}
+            {sources.value.map(source => <img key={source.domain} src={sourceImage(source)} alt={""} class="source-avatar size-3.5 rounded-full bg-surface shadow-[0_0_0_1.5px_var(--canvas)]" />)}
           </span>
           <span class="text-[12px] text-ink-2">{l.value.sources}</span>
         </button>
@@ -164,7 +174,7 @@ const StreamingText = createComponent<{
         <div class="overflow-hidden">
           <div class="mt-1.5 flex flex-col rounded-[10px] bg-inset p-1 shadow-hairline">
             {sources.value.map(source => <a key={source.domain} href={source.href} target="_blank" rel="noreferrer" class="flex items-center gap-2 rounded-[6px] px-1.5 py-1 text-[12px] text-ink-2 transition-colors duration-150 hover:bg-hover hover:text-ink">
-                <img src={sourceImage(source)} alt="" class="source-avatar size-4 rounded-[4px]" />
+                <img src={sourceImage(source)} alt={""} class="source-avatar size-4 rounded-[4px]" />
                 <span class="animated-underline">{source.name}</span>
                 <span class="ml-auto font-mono text-[10.5px] text-ink-3">{source.domain}</span>
               </a>)}

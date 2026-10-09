@@ -1,3 +1,4 @@
+import { t } from '@/lib/i18n';
 // Native Vue JSX. Design and behavior adapted from Beautiful UI (MIT).
 import type * as UI from '@/lib/dom-types';
 import { computed, type ComputedRef, type FunctionalComponent } from 'vue';
@@ -42,32 +43,32 @@ const VARIANTS: Record<string, {
   query?: string;
 }> = {
   Steps: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
+    get active() { return t("common.thinking"); },
+    get done() { return t("thinkingState.thoughtFor4Seconds"); },
     rows: [{
-      primary: "Reading flavor briefs"
+      get primary() { return t("thinkingState.readingFlavorBriefs"); }
     }, {
-      primary: "Scanning supplier lists"
+      get primary() { return t("thinkingState.scanningSupplierLists"); }
     }, {
-      primary: "Comparing tasting notes",
-      secondary: "6 flavors"
+      get primary() { return t("thinkingState.comparingTastingNotes"); },
+      get secondary() { return t("thinkingState.label6Flavors"); }
     }, {
-      primary: "Writing the scoop report"
+      get primary() { return t("thinkingState.writingTheScoopReport"); }
     }]
   },
   Reasoning: {
-    active: "Thinking",
-    done: "Thought for 4 seconds",
+    get active() { return t("common.thinking"); },
+    get done() { return t("thinkingState.thoughtFor4Seconds"); },
     rows: [{
-      primary: "Summer demand spikes for stone-fruit flavors — peach and apricot lead."
+      get primary() { return t("thinkingState.summerDemandSpikesForStoneFruitFlavorsPeachAnd"); }
     }, {
-      primary: "I should check cone inventory before promoting a waffle-bowl special."
+      get primary() { return t("thinkingState.iShouldCheckConeInventoryBeforePromotingAWaffle"); }
     }]
   },
   Search: {
-    active: "Searching the web",
-    done: "Searched the web",
-    query: "best waffle cone supplier",
+    get active() { return t("thinkingState.searchingTheWeb"); },
+    get done() { return t("thinkingState.searchedTheWeb"); },
+    get query() { return t("thinkingState.bestWaffleConeSupplier"); },
     rows: [{
       primary: "Joy Cone",
       secondary: "joycone.com",
@@ -83,20 +84,20 @@ const VARIANTS: Record<string, {
     }]
   },
   Coding: {
-    active: "Running tools",
-    done: "Ran 3 tools",
+    get active() { return t("thinkingState.runningTools"); },
+    get done() { return t("thinkingState.ran3Tools"); },
     rows: [{
-      primary: "Read",
+      get primary() { return t("thinkingState.read"); },
       secondary: "flavors.ts",
       mono: true
     }, {
-      primary: "Edit",
+      get primary() { return t("thinkingState.edit"); },
       secondary: "ChurnSchedule.tsx",
       mono: true,
       add: 74,
       del: 41
     }, {
-      primary: "Run",
+      get primary() { return t("thinkingState.run"); },
       secondary: "npm run freeze",
       mono: true
     }]
@@ -232,8 +233,8 @@ const ThinkingState = createComponent<{
                     {row.secondary}
                   </span>}
                 {row.add !== undefined && <span class="shrink-0 font-mono text-[11px] tabular-nums">
-                    <span class="text-green">+{row.add}</span>{" "}
-                    <span class="text-red">−{row.del}</span>
+                    <span class="text-green">{"+"}{row.add}</span>{" "}
+                    <span class="text-red">{"−"}{row.del}</span>
                   </span>}
                 </>;
                 const rowClass = "flex min-h-7 w-full items-center gap-2 rounded-[6px] px-1.5 py-0.5 text-left";
@@ -258,8 +259,7 @@ const ThinkingState = createComponent<{
             {variant.value === "Search" && stage.value >= 3 && <span class="text-[12px] text-ink-3" style={cssStyle({
                 animation: "fade-in 300ms ease-out both"
               })}>
-                +7 more
-              </span>}
+                {t("thinkingState.label7More")}</span>}
             </div>
           </div>
         </div>

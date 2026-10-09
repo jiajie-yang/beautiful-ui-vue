@@ -50,4 +50,4 @@ const DEMOS: Record<string, Component> = {
   "agent-screen": AgentScreen,
 };
 
-export const REGISTRY: Entry[] = META.map((m) => ({ ...m, Demo: DEMOS[m.id] }));
+export const REGISTRY: Entry[] = META.map((m) => ({ ...m, get title() { return m.title; }, get caption() { return m.caption; }, Demo: DEMOS[m.id] }));

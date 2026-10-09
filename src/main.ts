@@ -5,5 +5,6 @@ import './styles/globals.css'
 import './styles/site.css'
 import App from './App.vue'
 import { router } from './router'
+import { i18n } from './lib/i18n'
 
-createApp(App).use(router).mount('#app')
+createApp(App).use(i18n).use(router).mount('#app')
