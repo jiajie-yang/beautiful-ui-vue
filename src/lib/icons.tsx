@@ -1,0 +1,15 @@
+import { h, type FunctionalComponent } from 'vue'
+// Framework-independent replacements for the upstream licensed React icon set.
+const icon = (paths: string[]): FunctionalComponent<{ size?: number; className?: string }> => (props) => h('svg', { width: props.size ?? 18, height: props.size ?? 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': true, class: props.className }, paths.map(d => h('path', { d })))
+export const IconArrowBoxLeft = icon(['M10 5H5v14h5M14 8l-4 4 4 4M10 12h11'])
+export const IconCheckmark1Small = icon(['m5 12 4 4L19 6'])
+export const IconChevronDownSmall = icon(['m6 9 6 6 6-6'])
+export const IconCrossSmall = icon(['m6 6 12 12M6 18 18 6'])
+export const IconEditBig = icon(['m15 4 5 5M3 21l5-1L21 7l-5-5L3 15v6Z'])
+export const IconHome = icon(['M4 10Q4 9 5 8L11 3Q12 2 13 3L19 8Q20 9 20 10V18Q20 20 18 20H6Q4 20 4 18V10Z'])
+export const IconMagnifyingGlass = icon(['M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0ZM15 15l6 6'])
+export const IconPlusMedium = icon(['M12 4v16M4 12h16'])
+export const IconPopsicle2 = icon(['M6 14V8a6 6 0 0 1 12 0v6Q18 17 15 17H9Q6 17 6 14ZM10 17v3a2 2 0 0 0 4 0v-3'])
+export const IconSettingsGear1 = icon(['M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1 1-3ZM15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'])
+export const IconSidebarLeftArrow = icon(['M3 4h18v16H3V4ZM9 4v16M17 9l-3 3 3 3'])
+export const IconUserAdd = icon(['M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM3 21v-2a6 6 0 0 1 10-4M19 14v8M15 18h8'])
